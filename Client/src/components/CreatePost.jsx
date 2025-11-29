@@ -14,7 +14,7 @@ const CreatePost = () => {
 
   // Fetch logged-in user details (including userId)
   useEffect(() => {
-    axios.get("http://localhost:3000/profile", { withCredentials: true })
+    axios.get("https://test-pinterest.onrender.com/profile", { withCredentials: true })
       .then(res => {
         if (res.data.success) {
           setFormData(prev => ({ ...prev, userId: res.data.user._id })); // ✅ Set userId
@@ -44,7 +44,7 @@ const CreatePost = () => {
     data.append("userId", formData.userId); // ✅ Send userId
 
     try {
-      await axios.post("http://localhost:3000/posts/create", data, {
+      await axios.post("https://test-pinterest.onrender.com/posts/create", data, {
         withCredentials: true,
         headers: { "Content-Type": "multipart/form-data" },
       });

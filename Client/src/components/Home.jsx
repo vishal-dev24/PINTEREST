@@ -15,10 +15,10 @@ const Home = () => {
     const [newBoardName, setNewBoardName] = useState("");
 
     useEffect(() => {
-        axios.get("http://localhost:3000/profile", { withCredentials: true })
+        axios.get("https://test-pinterest.onrender.com/profile", { withCredentials: true })
             .then((res) => res.data.success ? setUser(res.data.user) : navigate("/login"));
 
-        axios.get("http://localhost:3000/posts")
+        axios.get("https://test-pinterest.onrender.com/posts")
             .then((res) => setPosts(res.data.posts))
             .catch(err => console.error(err));
     }, []);
@@ -26,13 +26,13 @@ const Home = () => {
     const openBoardModal = (postId) => {
         setSelectedPost(postId);
         setShowBoardModal(true);
-        axios.get("http://localhost:3000/boards", { withCredentials: true })
+        axios.get("https://test-pinterest.onrender.com/boards", { withCredentials: true })
             .then((res) => { setBoards(res.data.boards) })
             .catch(err => console.error(err));
     };
 
     const createBoard = () => {
-        axios.post("http://localhost:3000/boards", { name: newBoardName }, { withCredentials: true })
+        axios.post("https://test-pinterest.onrender.com/boards", { name: newBoardName }, { withCredentials: true })
             .then(() => {
                 setShowCreateBoardModal(false);
                 setNewBoardName("");
@@ -42,7 +42,7 @@ const Home = () => {
     };
 
     const saveToBoard = (boardId) => {
-        axios.post(`http://localhost:3000/boards/${boardId}/save`, { postId: selectedPost }, { withCredentials: true })
+        axios.post(`https://test-pinterest.onrender.com/boards/${boardId}/save`, { postId: selectedPost }, { withCredentials: true })
             .then(() => setShowBoardModal(false))
             .catch(err => console.error(err));
     };
@@ -70,7 +70,7 @@ const Home = () => {
                     </a>
                     <div className="flex space-x-2 items-center text-white">
                         {user && (
-                            <img src={`http://localhost:3000/uploads/${user.image}`} alt="User" className="w-12 h-12 border-2  border-slate-200 rounded-full" />
+                            <img src={`https://test-pinterest.onrender.com/uploads/${user.image}`} alt="User" className="w-12 h-12 border-2  border-slate-200 rounded-full" />
                         )}
                         <button onClick={() => navigate("/profile")} className="px-3 py-2 bg-gray-700 font-bold rounded-lg">Profile</button>
                     </div>
@@ -81,10 +81,10 @@ const Home = () => {
                 {posts.length > 0 ? (
                     posts.map((post) => (
                         <div key={post._id} className="relative group break-inside-avoid bg-white shadow-lg rounded-lg overflow-hidden">
-                            <img src={`http://localhost:3000/uploads/${post.image}`} alt={post.title} className="w-full object-cover rounded-t-lg" />
+                            <img src={`https://test-pinterest.onrender.com/uploads/${post.image}`} alt={post.title} className="w-full object-cover rounded-t-lg" />
                             <button className="absolute top-2 right-2 bg-slate-900 text-white px-3 py-1 rounded-lg opacity-0 group-hover:opacity-100 transition" onClick={() => openBoardModal(post._id)}> Save </button>
                             {/* Download */}
-                            <img src={lg} onClick={() => handleDownload(`http://localhost:3000/uploads/${post.image}`, post.title)}
+                            <img src={lg} onClick={() => handleDownload(`https://test-pinterest.onrender.com/uploads/${post.image}`, post.title)}
                                 className="absolute right-2 bottom-2 opacity-0 bg-white p-1 rounded-full shadow-lg group-hover:opacity-100 transition duration-300 hover:scale-110 hover:bg-gray-200 cursor-pointer" />
                         </div>
                     ))
@@ -102,7 +102,7 @@ const Home = () => {
                                 <button key={board._id} className="text-gray-800 hover:text-white flex items-center w-full py-1 px-4 bg-gray-100 border-2 border-zinc-400 rounded-lg mb-2 hover:bg-gray-800" onClick={() => saveToBoard(board._id)}>
                                     {/* Board Image */}
                                     {board.posts.length > 0 ? (
-                                        <img src={`http://localhost:3000/uploads/${board.posts[0].image}`}
+                                        <img src={`https://test-pinterest.onrender.com/uploads/${board.posts[0].image}`}
                                             alt={board.name}
                                             className="w-12 h-12 rounded-lg border-slate-600 border mr-5" />
                                     ) : (

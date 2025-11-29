@@ -15,7 +15,7 @@ const SinglePin = () => {
     const [showBoardModal, setShowBoardModal] = useState(false);
 
     useEffect(() => {
-        axios.get(`http://localhost:3000/posts/${postId}`, { withCredentials: true })
+        axios.get(`https://test-pinterest.onrender.com/posts/${postId}`, { withCredentials: true })
             .then((res) => {
                 setPost(res.data.post);
                 setLoading(false); // ✅ Update loading state
@@ -34,7 +34,7 @@ const SinglePin = () => {
         const confirmDelete = window.confirm("Are you sure you want to delete this pin?");
         if (!confirmDelete) return;
 
-        axios.delete(`http://localhost:3000/posts/${postId}`, { withCredentials: true })
+        axios.delete(`https://test-pinterest.onrender.com/posts/${postId}`, { withCredentials: true })
             .then(() => {
                 alert("Pin deleted successfully!");
                 navigate("/Pins"); // ✅ Redirect after deletion
@@ -45,13 +45,13 @@ const SinglePin = () => {
     const openBoardModal = (postId) => {
         setSelectedPost(postId);
         setShowBoardModal(true);
-        axios.get("http://localhost:3000/boards", { withCredentials: true })
+        axios.get("https://test-pinterest.onrender.com/boards", { withCredentials: true })
             .then((res) => { setBoards(res.data.boards) })
             .catch(err => console.error(err));
     };
 
     const saveToBoard = (boardId) => {
-        axios.post(`http://localhost:3000/boards/${boardId}/save`, { postId: selectedPost }, { withCredentials: true })
+        axios.post(`https://test-pinterest.onrender.com/boards/${boardId}/save`, { postId: selectedPost }, { withCredentials: true })
             .then(() => setShowBoardModal(false))
             .catch(err => console.error(err));
     };
@@ -90,7 +90,7 @@ const SinglePin = () => {
                     {/* Left: Image Section */}
                     <div className="md:w-1/2 relative group border border-gray-300 dark:border-gray-700 bg-gray-100 dark:bg-gray-800 rounded-xl overflow-hidden">
                         <img
-                            src={`http://localhost:3000/uploads/${post.image}`}
+                            src={`https://test-pinterest.onrender.com/uploads/${post.image}`}
                             alt={post.title}
                             className="object-cover w-full h-[380px] md:h-[480px] lg:h-[520px] transition-all rounded-xl"
                         />
@@ -106,7 +106,7 @@ const SinglePin = () => {
                         {/* Download Button */}
                         <img
                             src={lg}
-                            onClick={() => handleDownload(`http://localhost:3000/uploads/${post.image}`, post.title)}
+                            onClick={() => handleDownload(`https://test-pinterest.onrender.com/uploads/${post.image}`, post.title)}
                             className="absolute right-3 bottom-3 opacity-0 bg-blue-100 p-3 rounded-lg text-white shadow-md group-hover:opacity-100 transition-all hover:scale-105"
                         />
                     </div>
@@ -123,7 +123,7 @@ const SinglePin = () => {
                         {/* User Info & Likes */}
                         <div className="flex items-center gap-3">
                             {post.userId?.image && (
-                                <img src={`http://localhost:3000/uploads/${post.userId.image}`} alt={post.userId.username} className="w-14 h-14 rounded-full object-cover border-2 border-gray-400 shadow-md" />
+                                <img src={`https://test-pinterest.onrender.com/uploads/${post.userId.image}`} alt={post.userId.username} className="w-14 h-14 rounded-full object-cover border-2 border-gray-400 shadow-md" />
                             )}
                             <p className="text-gray-600 dark:text-gray-400 text-lg font-semibold">{post.likes || 0} ❤️</p>
                         </div>
@@ -161,7 +161,7 @@ const SinglePin = () => {
                                     >
                                         {/* Board Image */}
                                         {board.posts.length > 0 ? (
-                                            <img src={`http://localhost:3000/uploads/${board.posts[0].image}`}
+                                            <img src={`https://test-pinterest.onrender.com/uploads/${board.posts[0].image}`}
                                                 alt={board.name}
                                                 className="w-14 h-14 rounded-lg border border-gray-400 mr-4 object-cover"
                                             />

@@ -14,7 +14,7 @@ const Login = () => {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-    await axios.post('http://localhost:3000/login', formData, { withCredentials: true });
+    await axios.post('https://test-pinterest.onrender.com/login', formData, { withCredentials: true });
     setFormData({ username: '', email: '' });
     navigate('/home');
   }
