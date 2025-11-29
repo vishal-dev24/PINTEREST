@@ -17,7 +17,6 @@ app.use('/uploads', express.static(path.join(__dirname, 'uploads')));
 
 
 const SECRET = "shhhh"; // Secret key for JWT
-const PORT = process.env.PORT || 3000;
 
 
 // 🟢 Register Route
@@ -27,7 +26,11 @@ app.post('/register', upload.single('image'), async (req, res) => {
     bcrypt.hash(password, 10, async (err, hash) => {
         const user = await userModel.create({ username, email, password: hash, image: imagefile });
         const token = jwt.sign({ email, userId: user._id }, SECRET);
-        res.cookie("token", token, { httpOnly: true });
+        res.cookie("token", token, {
+            httpOnly: true,
+            secure: true,
+            sameSite: "none",
+        })
         res.json({ success: true, message: "User registered successfully", user });
     });
 });
@@ -41,7 +44,11 @@ app.post('/login', async (req, res) => {
     bcrypt.compare(password, user.password, (err, result) => {
         if (result) {
             const token = jwt.sign({ email, userId: user._id }, SECRET);
-            res.cookie("token", token, { httpOnly: true });
+            res.cookie("token", token, {
+                httpOnly: true,
+                secure: true,
+                sameSite: "none",
+            })
             res.json({ success: true, message: "Login successful", user });
         } else {
             res.status(400).json({ success: false, message: "Invalid email or password" });
