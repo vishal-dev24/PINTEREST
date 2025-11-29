@@ -27,10 +27,10 @@ const Register = () => {
     <div className="min-h-screen w-full bg-gray-100">
       <nav className="w-full bg-white p-2 shadow-md">
         <div className="flex justify-between items-center px-5">
-          <a href="#" className="text-3xl font-extrabold flex items-center space-x-3">
+          <button onClick={() => navigate("/home")} className="text-3xl font-extrabold flex items-center space-x-1">
             <img src={img} alt="Pinterest Icon" className="w-12 h-12 rounded-full shadow-md" />
             <span className="tracking-wide text-gray-800">Phinix</span>
-          </a>
+          </button>
           <button type="submit" onClick={useNavigate('/login')}
             className="bg-gray-800 hover:bg-gray-700 font-bold text-white px-3 py-2 rounded"><Link to="/login" >Login</Link></button>
         </div>

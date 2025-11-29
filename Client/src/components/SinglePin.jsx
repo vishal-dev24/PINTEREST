@@ -73,10 +73,10 @@ const SinglePin = () => {
         <>
             <nav className="bg-white shadow-lg p-2 sticky top-0 z-50 w-full">
                 <div className="flex justify-between items-center px-1">
-                    <a href={'/home'} className="text-3xl font-extrabold flex items-center space-x-1">
+                    <button onClick={() => navigate("/home")} className="text-3xl font-extrabold flex items-center space-x-1">
                         <img src={img} alt="Pinterest Icon" className="w-12 h-12 rounded-full shadow-md" />
                         <span className="tracking-wide text-gray-800">Phinix</span>
-                    </a>
+                    </button>
                     <div className="flex space-x-2 items-center font-semibold">
                         <button onClick={() => navigate("/CreatePost")} className="px-3 py-2 bg-gray-700 text-white rounded-lg">CreatePin</button>
                         <button onClick={() => navigate("/Pins")} className="px-3 py-2 bg-gray-700 text-white rounded-lg">Pins</button>

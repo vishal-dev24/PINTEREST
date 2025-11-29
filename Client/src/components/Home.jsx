@@ -64,10 +64,10 @@ const Home = () => {
             {/* Navbar */}
             <nav className=" bg-white shadow-xl p-2 sticky top-0 z-50 w-full">
                 <div className="flex justify-between items-center px-1">
-                    <a href="#" className="text-3xl font-extrabold flex items-center space-x-1">
-                        <img src={img} alt="Pinterest Icon" className="w-12 h-12 rounded-full" />
+                    <button onClick={() => navigate("/home")} className="text-3xl font-extrabold flex items-center space-x-1">
+                        <img src={img} alt="Pinterest Icon" className="w-12 h-12 rounded-full shadow-md" />
                         <span className="tracking-wide text-gray-800">Phinix</span>
-                    </a>
+                    </button>
                     <div className="flex space-x-2 items-center text-white">
                         {user && (
                             <img src={`https://test-pinterest.onrender.com/uploads/${user.image}`} alt="User" className="w-12 h-12 border-2  border-slate-200 rounded-full" />
