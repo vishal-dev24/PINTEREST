@@ -13,7 +13,7 @@ const app = express();
 app.use(express.json());
 app.use(cookieParser());
 app.use(cors({
-    origin: ["https://test-pinterest-1.onrender.com"],
+    origin: ["https://test-pinterest-1.onrender.com", "https://test-pinterest.onrender.com"],
     credentials: true
 }));
 
