@@ -1,81 +1,55 @@
 const express = require('express');
-const cookieParser = require('cookie-parser');
-const userModel = require('./models/users');
-const postModel = require('./models/posts');
-const boardModel = require('./models/boards');
-const upload = require('./models/multer');
-const bcrypt = require('bcrypt');
-const jwt = require('jsonwebtoken');
-const cors = require('cors');
-const path = require('path');
-
 const app = express();
+const cookieParser = require('cookie-parser');
+const userModel = require('./routes/users');
+const postModel = require('./routes/posts');
+const boardModel = require('./routes/boards');
+const upload = require('./routes/cloudinary');
+const jwt = require('jsonwebtoken');
+const bcrypt = require('bcrypt');
+const cors = require('cors');
+
 app.use(express.json());
 app.use(cookieParser());
-app.use(cors({
-    origin: ["https://test-pinterest-1.onrender.com", "https://test-pinterest.onrender.com"],
-    credentials: true
-}));
-
-app.use('/uploads', express.static(path.join(__dirname, 'uploads')));
-
-
-const SECRET = "shhhh"; // Secret key for JWT
-
+app.use(cors({ origin: ["https://test-pinterest-1.onrender.com", "https://test-pinterest.onrender.com"], credentials: true }));
 
 // 🟢 Register Route
 app.post('/register', upload.single('image'), async (req, res) => {
     const { username, email, password } = req.body;
-    const imagefile = req.file ? req.file.filename : null;
-    bcrypt.hash(password, 10, async (err, hash) => {
-        const user = await userModel.create({ username, email, password: hash, image: imagefile });
-        const token = jwt.sign({ email, userId: user._id }, SECRET);
-        res.cookie("token", token, {
-            httpOnly: true,
-            secure: true,
-            sameSite: "none",
-        })
-        res.json({ success: true, message: "User registered successfully", user });
-    });
+    const imageUrl = req.file?.path || null;
+    const hash = await bcrypt.hash(password, 10);
+    const user = await userModel.create({ username, email, password: hash, image: imageUrl })
+    const token = jwt.sign({ email, userid: user._id }, "shhhh");
+    res.cookie("token", token, { httpOnly: true, sameSite: "none", secure: true });
+    res.json({ message: "registered" })
 });
+
 // 🟢 Login Route
 app.post('/login', async (req, res) => {
     const { email, password } = req.body;
     const user = await userModel.findOne({ email });
-
-    if (!user) return res.status(400).json({ success: false, message: "Invalid email or password" });
-
-    bcrypt.compare(password, user.password, (err, result) => {
-        if (result) {
-            const token = jwt.sign({ email, userId: user._id }, SECRET);
-            res.cookie("token", token, {
-                httpOnly: true,
-                secure: true,
-                sameSite: "none",
-            })
-            res.json({ success: true, message: "Login successful", user });
-        } else {
-            res.status(400).json({ success: false, message: "Invalid email or password" });
-        }
-    });
+    if (!user) return res.json('user not found');
+    const result = await bcrypt.compare(password, user.password);
+    if (!result) return res.json("wrong password");
+    const token = jwt.sign({ email, userid: user._id }, "shhhh");
+    res.cookie("token", token, { httpOnly: true, sameSite: "none", secure: true });
+    res.json({ message: "Logged in" });
 });
+
+
+
 // 🟢 Middleware to Check Login
 function isLoggedIn(req, res, next) {
     const token = req.cookies.token;
-    if (!token) return res.status(401).json({ success: false, message: "Unauthorized" });
+    if (!token) return res.redirect('/login');
+    const { userId, email } = jwt.verify(token, shhhh);
+    req.user = { _id: userId, email };
+    next();
 
-    try {
-        const { userId, email } = jwt.verify(token, SECRET);
-        req.user = { _id: userId, email };
-        next();
-    } catch (err) {
-        return res.status(401).json({ success: false, message: "Invalid token" });
-    }
 }
 // 🟢 Profile Route
 app.get('/profile', isLoggedIn, async (req, res) => {
     const user = await userModel.findOne({ email: req.user.email });
-    if (!user) return res.status(404).json({ success: false, message: "User not found" });
     res.json({ success: true, user });
 });
 
