@@ -11,7 +11,7 @@ const cors = require('cors');
 
 app.use(express.json());
 app.use(cookieParser());
-app.use(cors({ origin: ["https://test-pinterest-1.onrender.com", "https://test-pinterest.onrender.com"], credentials: true }));
+app.use(cors({ origin: "https://test-pinterest-1.onrender.com", credentials: true }));
 // ---------------------- 🟢 AUTH ----------------------
 
 // Register
@@ -19,21 +19,12 @@ app.post('/register', upload.single('image'), async (req, res) => {
     try {
         const { username, email, password } = req.body;
         const imageUrl = req.file?.path || null;
-
         const existingUser = await userModel.findOne({ email });
         if (existingUser) return res.json({ success: false, message: "User already exists" });
-
         const hash = await bcrypt.hash(password, 10);
         const user = await userModel.create({ username, email, password: hash, image: imageUrl });
-
         const token = jwt.sign({ userId: user._id, email: user.email }, "shhhh");
-
-        res.cookie("token", token, {
-            httpOnly: true,
-            sameSite: "lax", // localhost testing ke liye "lax"
-            secure: false,   // local testing me false
-        });
-
+        res.cookie("token", token, { httpOnly: true, secure: true, sameSite: "none", });
         res.json({ success: true, message: "Registered successfully", user });
     } catch (err) {
         console.error(err);
@@ -47,18 +38,10 @@ app.post('/login', async (req, res) => {
         const { email, password } = req.body;
         const user = await userModel.findOne({ email });
         if (!user) return res.json({ success: false, message: 'User not found' });
-
         const result = await bcrypt.compare(password, user.password);
         if (!result) return res.json({ success: false, message: 'Wrong password' });
-
         const token = jwt.sign({ userId: user._id, email: user.email }, "shhhh");
-
-        res.cookie("token", token, {
-            httpOnly: true,
-            sameSite: "lax",
-            secure: false
-        });
-
+        res.cookie("token", token, { httpOnly: true, secure: true, sameSite: "none", });
         res.json({ success: true, message: "Logged in", user });
     } catch (err) {
         console.error(err);
