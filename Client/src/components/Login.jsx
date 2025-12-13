@@ -30,21 +30,19 @@ const Login = () => {
         </div>
       </nav>
 
-      <div className="flex items-center justify-center flex-col p-7">
-        <div className="bg-white p-6 rounded-xl shadow-xl w-full max-w-lg border-2 border-gray-600">
-          <h2 className="text-gray-900 text-3xl font-extrabold text-center mb-6">Join Phinix</h2>
-          <form onSubmit={handleSubmit} className="space-y-4">
+      <div className="flex items-start justify-center pt-20">
+        <div className="w-full max-w-xs bg-white border border-gray-500 rounded-lg shadow-lg p-4">
+          <h2 className="text-2xl font-bold text-center text-gray-900 mb-3">Join Phinix</h2>
+
+          <form onSubmit={handleSubmit} className="space-y-3">
             <div>
-              <label className="block text-gray-800 font-semibold mb-3">Email</label>
-              <input type="email" name='email'
-                className="w-full p-3 rounded-lg border border-gray-500 focus:ring-2 focus:ring-gray-600 outline-none"
-                placeholder="Enter your email" onChange={handleChange} required value={formData.email} />
+              <label className="block text-sm sm:text-sm font-semibold text-gray-800 mb-1">Email</label>
+              <input type="email" name="email" value={formData.email} onChange={handleChange} required placeholder="Enter your email" className="w-full p-2 sm:p-3 text-sm sm:text-base border border-gray-500 rounded-md sm:rounded-lg outline-none focus:ring-1 focus:ring-gray-600" />
             </div>
+
             <div>
-              <label className="block text-gray-800 font-semibold mb-3">Password</label>
-              <input type="password" name='password'
-                className="w-full p-3 rounded-lg border border-gray-500 focus:ring-2 focus:ring-gray-600 outline-none"
-                placeholder="Enter password" onChange={handleChange} required value={formData.password} />
+              <label className="block text-sm sm:text-sm font-semibold text-gray-800 mb-1">Password</label>
+              <input type="password" name="password" value={formData.password} onChange={handleChange} required placeholder="Enter password" className="w-full p-2 sm:p-3 text-sm sm:text-base border border-gray-500 rounded-md sm:rounded-lg outline-none focus:ring-1 focus:ring-gray-600" />
             </div>
 
             <button type="submit"

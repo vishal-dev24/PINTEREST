@@ -15,6 +15,7 @@ const Profile = () => {
 
   useEffect(() => {
     axios.get('https://test-pinterest.onrender.com/profile', { withCredentials: true })
+
       .then(res => {
         if (res.data.success) {
           setUser(res.data.user);

@@ -1,6 +1,6 @@
 import React, { useState } from 'react'
 import axios from 'axios'
-import { Link, useNavigate } from 'react-router-dom';
+import { useNavigate } from 'react-router-dom';
 import img from '../assets/pin.ico'
 
 const Register = () => {
@@ -15,14 +15,12 @@ const Register = () => {
   const handleSubmit = async (e) => {
     e.preventDefault();
     const data = new FormData();
-    data.append('username', formData.username);
-    data.append('email', formData.email);
-    data.append('password', formData.password);
-    data.append('image', formData.image);
+    Object.keys(formData).forEach(key => data.append(key, formData[key]));
     await axios.post('https://test-pinterest.onrender.com/register', data, { withCredentials: true });
     setFormData({ username: '', email: '', password: '', image: null });
     navigate('/login');
   }
+
   return (
     <div className="min-h-screen w-full bg-gray-100">
       <nav className="w-full bg-white p-2 shadow-md">
@@ -35,42 +33,38 @@ const Register = () => {
         </div>
       </nav>
 
-      <div className="flex items-center justify-center flex-col p-7">
-        <div className="bg-white p-6 rounded-xl shadow-xl w-full max-w-lg border-2 border-gray-600">
-          <h2 className="text-gray-900 text-3xl font-extrabold text-center mb-6">Join Phinix</h2>
+      <div className="flex items-start justify-center pt-16">
+        <div className="w-full max-w-xs bg-white border border-gray-500 rounded-lg shadow-lg p-4">
+          <h2 className="text-2xl font-bold text-center text-gray-900 mb-3">Join Phinix</h2>
+
           <form onSubmit={handleSubmit} className="space-y-3">
             <div>
-              <label className="block text-gray-700 font-semibold mb-3">Full Name</label>
-              <input type="text" name='username'
-                className="w-full p-3 rounded-lg border border-gray-300 focus:ring-2 focus:ring-gray-600 outline-none"
-                placeholder="Enter your name" onChange={handleChange} required value={formData.username} />
+              <label className="block text-sm sm:text-sm font-semibold text-gray-800 mb-1">Full Name</label>
+              <input type="text" name="username" value={formData.username} onChange={handleChange} required placeholder="Enter your name" className="w-full p-2 sm:p-3 text-sm sm:text-base border border-gray-400 rounded-md sm:rounded-lg outline-none focus:ring-1 focus:ring-gray-600" />
             </div>
+
             <div>
-              <label className="block text-gray-700 font-semibold mb-3">Email</label>
-              <input type="email" name='email'
-                className="w-full p-3 rounded-lg border border-gray-300 focus:ring-2 focus:ring-gray-600 outline-none"
-                placeholder="Enter your email" onChange={handleChange} required value={formData.email} />
+              <label className="block text-sm sm:text-sm font-semibold text-gray-800 mb-1">Email</label>
+              <input type="email" name="email" value={formData.email} onChange={handleChange} required placeholder="Enter your email" className="w-full p-2 sm:p-3 text-sm sm:text-base border border-gray-400 rounded-md sm:rounded-lg outline-none focus:ring-1 focus:ring-gray-600" />
             </div>
+
             <div>
-              <label className="block text-gray-700 font-semibold mb-3">Password</label>
-              <input type="password" name='password'
-                className="w-full p-3 rounded-lg border border-gray-300 focus:ring-2 focus:ring-gray-600 outline-none"
-                placeholder="Enter password" onChange={handleChange} required value={formData.password} />
+              <label className="block text-sm sm:text-sm font-semibold text-gray-800 mb-1">Password</label>
+              <input type="password" name="password" value={formData.password} onChange={handleChange} required placeholder="Enter password" className="w-full p-2 sm:p-3 text-sm sm:text-base border border-gray-400 rounded-md sm:rounded-lg outline-none focus:ring-1 focus:ring-gray-600" />
             </div>
+
             <div>
-              <label className="block text-gray-700 font-semibold mb-3">Upload Image</label>
-              <input type="file" name='image'
-                className="w-full p-3 rounded-lg border border-gray-300 focus:ring-2 focus:ring-gray-600 outline-none"
-                placeholder="Enter password" onChange={handleChange} required />
+              <label className="block text-sm sm:text-sm font-semibold text-gray-800 mb-1">Upload Image</label>
+              <input type="file" name="image" onChange={handleChange} required className="w-full text-xs sm:text-sm border border-gray-400 rounded-md sm:rounded-lg p-1.5 sm:p-2.5" />
             </div>
-            <button type="submit"
-              className="w-full bg-gray-900 hover:bg-gray-700 text-white font-bold py-3 rounded-lg transition duration-300 shadow-md">
-              Register !
-            </button>
+
+            <button type="submit" className="w-full bg-gray-900 text-white text-sm sm:text-base font-semibold py-2 sm:py-3 rounded-md sm:rounded-lg hover:bg-gray-700">Register</button>
           </form>
         </div>
       </div>
-    </div>
+
+
+    </div >
   )
 }
 
