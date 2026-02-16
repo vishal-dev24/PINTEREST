@@ -112,6 +112,7 @@ const Home = () => {
     };
 
     const handleDownload = async (imageUrl, title) => {
+        if (!imageUrl) return; // 🔹 Check if image exists
         const response = await fetch(imageUrl);
         const blob = await response.blob();
         const link = document.createElement("a");
@@ -133,9 +134,9 @@ const Home = () => {
                     </button>
 
                     <div className="flex space-x-2 items-center text-white">
-                        {user && (
+                        {user?.image && (
                             <img
-                                src={`https://test-pinterest.onrender.com/${user.image}`}
+                                src={user.image}
                                 alt="User"
                                 className="w-12 h-12 border-2 border-slate-200 rounded-full"
                             />
@@ -154,13 +155,19 @@ const Home = () => {
             <div className="p-5 columns-2 sm:columns-3 md:columns-4 lg:columns-5 gap-4 space-y-4">
                 {posts.map((post) => (
                     <div key={post._id} className="relative group break-inside-avoid bg-white shadow-lg rounded-lg overflow-hidden">
-                        <a onClick={() => navigate(`/post/${post._id}`)}>
-                            <img src={`https://test-pinterest.onrender.com/${post.image}`} alt={post.title} className="w-full object-cover rounded-t-lg" />
-                        </a>
+                        {post.image && (
+                            <a onClick={() => navigate(`/post/${post._id}`)}>
+                                <img src={post.image} alt={post.title} className="w-full object-cover rounded-t-lg" />
+                            </a>
+                        )}
 
-                        <button onClick={() => openBoardModal(post._id)} className="absolute top-2 right-2 bg-slate-900 text-white px-3 py-1 rounded-lg opacity-0 group-hover:opacity-100 transition"> Save </button>
+                        {post.image && (
+                            <button onClick={() => openBoardModal(post._id)} className="absolute top-2 right-2 bg-slate-900 text-white px-3 py-1 rounded-lg opacity-0 group-hover:opacity-100 transition"> Save </button>
+                        )}
 
-                        <img src={lg} onClick={() => handleDownload(`https://test-pinterest.onrender.com/${post.image}`, post.title)} className="absolute right-2 bottom-2 opacity-0 bg-white p-1 rounded-full shadow-lg group-hover:opacity-100 transition duration-300 hover:scale-110 hover:bg-gray-200 cursor-pointer" />
+                        {post.image && (
+                            <img src={lg} onClick={() => handleDownload(post.image, post.title)} className="absolute right-2 bottom-2 opacity-0 bg-white p-1 rounded-full shadow-lg group-hover:opacity-100 transition duration-300 hover:scale-110 hover:bg-gray-200 cursor-pointer" />
+                        )}
                     </div>
                 ))}
             </div>
@@ -170,6 +177,8 @@ const Home = () => {
                     Loading more posts...
                 </p>
             )}
+
+            {/* Board Modal */}
             {showBoardModal && (
                 <div className="fixed inset-0 flex items-center justify-center bg-black bg-opacity-50">
                     <div className="bg-white p-5 rounded-lg shadow-lg w-80">
@@ -177,21 +186,18 @@ const Home = () => {
                         {boards.length > 0 ? (
                             boards.map((board) => (
                                 <button key={board._id} className="text-gray-800 hover:text-white flex items-center w-full py-1 px-4 bg-gray-100 border-2 border-zinc-400 rounded-lg mb-2 hover:bg-gray-800" onClick={() => saveToBoard(board._id)}>
-                                    {/* Board Image */}
-                                    {board.posts.length > 0 ? (
-                                        <img src={`https://test-pinterest.onrender.com/${board.posts[0].image}`}
-                                            alt={board.name}
-                                            className="w-12 h-12 rounded-lg border-slate-600 border mr-5" />
+                                    {board.posts.length > 0 && board.posts[0].image ? (
+                                        <img src={board.posts[0].image} alt={board.name} className="w-12 h-12 rounded-lg border-slate-600 border mr-5" />
                                     ) : (
-                                        <img src="https://via.placeholder.com/50" className="w-10 h-5 rounded-lg mr-3" />
+                                        <img src="https://via.placeholder.com/50" className="w-12 h-12 rounded-lg mr-5" />
                                     )}
-                                    <h2 className="text-xl capitalize font-bold tracking-wide">{board.name} </h2>
+                                    <h2 className="text-xl capitalize font-bold tracking-wide">{board.name}</h2>
                                 </button>
                             ))
                         ) : (
                             <p className="text-gray-500">No boards found.</p>
                         )}
-                        <div className="flex justify-between p-2  rounded">
+                        <div className="flex justify-between p-2 rounded">
                             <button onClick={() => { setShowBoardModal(false); setShowCreateBoardModal(true); }} className="mt-3 text-blue-900 bg-slate-300 p-2 rounded hover:bg-cyan-600 hover:text-white text-lg">
                                 + Create New Board
                             </button>
@@ -217,7 +223,6 @@ const Home = () => {
                     </div>
                 </div>
             )}
-
         </div>
     );
 };

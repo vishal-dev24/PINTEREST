@@ -109,7 +109,7 @@ const SinglePin = () => {
                     {/* Left: Image Section */}
                     <div className="md:w-1/2 relative group border border-gray-300 dark:border-gray-700 bg-gray-100 dark:bg-gray-800 rounded-xl overflow-hidden">
                         <img
-                            src={`https://test-pinterest.onrender.com/${post.image}`}
+                            src={post.image}
                             alt={post.title}
                             className="object-cover w-full h-[380px] md:h-[480px] lg:h-[520px] transition-all rounded-xl"
                         />
@@ -131,7 +131,7 @@ const SinglePin = () => {
                         {/* Download */}
                         <img
                             src={lg}
-                            onClick={() => handleDownload(`https://test-pinterest.onrender.com/${post.image}`, post.title)}
+                            onClick={() => handleDownload(post.image, post.title)}
                             className="absolute right-3 bottom-3 opacity-0 bg-blue-100 p-3 rounded-lg text-white shadow-md group-hover:opacity-100 transition-all hover:scale-105 cursor-pointer"
                         />
                     </div>
@@ -148,7 +148,7 @@ const SinglePin = () => {
                         <div className="flex items-center gap-3">
                             {post.userId?.image && (
                                 <img
-                                    src={`https://test-pinterest.onrender.com/${post.userId.image}`}
+                                    src={post.userId.image}
                                     alt={post.userId.username}
                                     className="w-14 h-14 rounded-full object-cover border-2 border-gray-400 shadow-md"
                                 />
@@ -236,7 +236,7 @@ const SinglePin = () => {
                         className="fixed inset-0 p-12 bg-black bg-opacity-80 flex items-center justify-center z-50 cursor-zoom-out"
                     >
                         <img
-                            src={`https://test-pinterest.onrender.com/${post.image}`}
+                            src={post.image}
                             alt={post.title}
                             className="max-w-full max-h-full object-contain rounded-lg shadow-lg"
                         />
@@ -257,7 +257,7 @@ const SinglePin = () => {
                                     >
                                         {board.posts.length > 0 ? (
                                             <img
-                                                src={`https://test-pinterest.onrender.com/${board.posts[0].image}`}
+                                                src={board.posts[0].image}
                                                 alt={board.name}
                                                 className="w-14 h-14 rounded-lg border border-gray-400 mr-4 object-cover"
                                             />

@@ -76,7 +76,7 @@ const Dashboard = () => {
             {/* User Info */}
             <div className="flex items-center bg-white dark:bg-gray-800 p-6 rounded-xl shadow-lg mb-6 space-x-6">
                 <div className="w-32 h-32 rounded-full overflow-hidden border-4 border-gray-300 dark:border-gray-600">
-                    <img src={`https://test-pinterest.onrender.com/${data.user.image}`} alt="User" className="w-full h-full object-cover" />
+                    <img src={data.user.image} alt="User" className="w-full h-full object-cover" />
                 </div>
                 <div>
                     <h2 className="text-3xl font-bold text-gray-900 dark:text-white">{data.user.username}</h2>
@@ -94,7 +94,7 @@ const Dashboard = () => {
                         {data.posts.map((post) => (
                             <div key={post._id} className="bg-white dark:bg-gray-800 rounded-xl shadow-md p-2 hover:shadow-xl transition-all">
                                 <a onClick={() => navigate(`/post/${post._id}`)}>
-                                    <img src={`https://test-pinterest.onrender.com/${post.image}`} alt={post.title} className="w-full h-48 object-cover rounded-lg mb-2" />
+                                    <img src={post.image} alt={post.title} className="w-full h-48 object-cover rounded-lg mb-2" />
                                 </a>
                                 <h3 className="text-lg font-semibold text-gray-900 dark:text-white">{post.title}</h3>
                                 <p className="text-gray-600 dark:text-gray-400 text-sm">{post.description?.slice(0, 50)}...</p>
@@ -134,7 +134,7 @@ const Dashboard = () => {
                                     {board.posts.map((post) => (
                                         <div key={post._id} className="relative group">
                                             <img
-                                                src={`https://test-pinterest.onrender.com/${post.image}`}
+                                                src={post.image}
                                                 alt={post.title}
                                                 className="w-full h-24 object-cover rounded-md"
                                             />
