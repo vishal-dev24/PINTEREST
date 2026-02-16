@@ -1,35 +1,140 @@
+// const express = require('express');
+// const app = express();
+// const cookieParser = require('cookie-parser');
+// const userModel = require('./routes/users');
+// const postModel = require('./routes/posts');
+// const boardModel = require('./routes/boards');
+// const upload = require('./routes/cloudinary');
+// const bcrypt = require('bcrypt');
+// const jwt = require('jsonwebtoken');
+// app.use(express.json());
+// app.use(cookieParser());
+
+// const cors = require("cors");
+
+// app.use(cors({ origin: ['https://test-pinterest.onrender.com', 'https://test-pinterest-1.onrender.com'], credentials: true }));
+
+// const SECRET = "shhhh";
+
+// app.use((req, res, next) => {
+//     console.log(`${req.method} request is on URL: ${req.url}`);
+//     next()
+// });
+
+// // 🟢 Register Route
+// app.post('/register', upload.single('image'), async (req, res) => {
+//     const { username, email, password } = req.body;
+//     const imagefile = req.file ? req.file.path : null;
+//     const hash = await bcrypt.hash(password, 10);
+//     const user = await userModel.create({ username, email, password: hash, image: imagefile });
+//     const token = jwt.sign({ email, userId: user._id }, SECRET);
+//     res.cookie("token", token, { httpOnly: true, secure: true, sameSite: "none" });
+//     res.json({ success: true, message: "User registered successfully", user });
+// });
+
+// // 🟢 Login Route
+// app.post('/login', async (req, res) => {
+//     try {
+//         const { email, password } = req.body;
+//         const user = await userModel.findOne({ email });
+//         if (!user) return res.status(400).json({ success: false, message: "Invalid email or password" });
+//         const result = await bcrypt.compare(password, user.password);
+//         if (!result) return res.json({ success: false, message: 'Wrong password' });
+//         const token = jwt.sign({ email, userId: user._id }, SECRET);
+//         res.cookie("token", token, { httpOnly: true, secure: true, sameSite: "none", });
+//         res.json({ success: true, message: "Login successful", user });
+//     } catch (err) {
+//         console.error(err);
+//         res.status(500).json({ success: false, message: "Server error" });
+//     }
+// });
+
+// // 🟢 Middleware
+// function isLoggedIn(req, res, next) {
+//     const token = req.cookies.token;
+//     if (!token) return res.status(401).json({ success: false, message: "Unauthorized" });
+//     const { email, userid } = jwt.verify(token, SECRET);
+//     req.user = { email, _id: userid }
+//     next();
+// }
+
+// // 🟢 Profile
+// app.get('/profile', isLoggedIn, async (req, res) => {
+//     const user = await userModel.findById(req.user._id);
+//     if (!user) return res.status(404).json({ success: false, message: "User not found" });
+//     res.json({ success: true, user });
+// });
+
+// // 🟢 Logout
+// app.get("/logout", (req, res) => {
+//     res.cookie("token", "", { httpOnly: true, secure: true, sameSite: "none" });
+//     res.json({ success: true, message: "Logged out successfully" });
+// });
+
+// 🟢 Update Profile
+
+
+
 const express = require('express');
 const app = express();
 const cookieParser = require('cookie-parser');
+const cors = require("cors");
+const bcrypt = require('bcrypt');
+const jwt = require('jsonwebtoken');
+
+// Routes
 const userModel = require('./routes/users');
 const postModel = require('./routes/posts');
 const boardModel = require('./routes/boards');
 const upload = require('./routes/cloudinary');
-const bcrypt = require('bcrypt');
-const jwt = require('jsonwebtoken');
+
 app.use(express.json());
 app.use(cookieParser());
 
-const cors = require("cors");
+// 🔹 CORS Setup
+const allowedOrigins = ['https://test-pinterest.onrender.com', 'https://test-pinterest-1.onrender.com'];
+app.use(cors({
+    origin: allowedOrigins,
+    credentials: true
+}));
 
-app.use(cors({ origin: ['https://test-pinterest.onrender.com', 'https://test-pinterest-1.onrender.com'], credentials: true }));
-
-const SECRET = "shhhh";
-
+// 🔹 Logging
 app.use((req, res, next) => {
-    console.log(`${req.method} request is on URL: ${req.url}`);
-    next()
+    console.log(`${req.method} request on ${req.url}`);
+    next();
 });
+
+const SECRET = "shhhh"; // Move to env variable in production
+const isProduction = process.env.NODE_ENV === 'production';
 
 // 🟢 Register Route
 app.post('/register', upload.single('image'), async (req, res) => {
-    const { username, email, password } = req.body;
-    const imagefile = req.file ? req.file.path : null;
-    const hash = await bcrypt.hash(password, 10);
-    const user = await userModel.create({ username, email, password: hash, image: imagefile });
-    const token = jwt.sign({ email, userId: user._id }, SECRET);
-    res.cookie("token", token, { httpOnly: true, secure: true, sameSite: "none" });
-    res.json({ success: true, message: "User registered successfully", user });
+    try {
+        const { username, email, password } = req.body;
+        const imagefile = req.file ? req.file.path : null;
+
+        // Hash password
+        const hash = await bcrypt.hash(password, 10);
+
+        // Create user
+        const user = await userModel.create({ username, email, password: hash, image: imagefile });
+
+        // Create JWT token
+        const token = jwt.sign({ email, userId: user._id }, SECRET, { expiresIn: '7d' });
+
+        // Set cookie
+        res.cookie("token", token, {
+            httpOnly: true,
+            secure: isProduction,
+            sameSite: isProduction ? "none" : "lax",
+            maxAge: 7 * 24 * 60 * 60 * 1000 // 7 days
+        });
+
+        res.json({ success: true, message: "User registered successfully", user });
+    } catch (err) {
+        console.error(err);
+        res.status(500).json({ success: false, message: "Server error" });
+    }
 });
 
 // 🟢 Login Route
@@ -38,10 +143,19 @@ app.post('/login', async (req, res) => {
         const { email, password } = req.body;
         const user = await userModel.findOne({ email });
         if (!user) return res.status(400).json({ success: false, message: "Invalid email or password" });
-        const result = await bcrypt.compare(password, user.password);
-        if (!result) return res.json({ success: false, message: 'Wrong password' });
-        const token = jwt.sign({ email, userId: user._id }, SECRET);
-        res.cookie("token", token, { httpOnly: true, secure: true, sameSite: "none", });
+
+        const match = await bcrypt.compare(password, user.password);
+        if (!match) return res.status(400).json({ success: false, message: "Wrong password" });
+
+        const token = jwt.sign({ email, userId: user._id }, SECRET, { expiresIn: '7d' });
+
+        res.cookie("token", token, {
+            httpOnly: true,
+            secure: isProduction,
+            sameSite: isProduction ? "none" : "lax",
+            maxAge: 7 * 24 * 60 * 60 * 1000
+        });
+
         res.json({ success: true, message: "Login successful", user });
     } catch (err) {
         console.error(err);
@@ -49,29 +163,45 @@ app.post('/login', async (req, res) => {
     }
 });
 
-// 🟢 Middleware
+// 🟢 Middleware to check login
 function isLoggedIn(req, res, next) {
     const token = req.cookies.token;
     if (!token) return res.status(401).json({ success: false, message: "Unauthorized" });
-    const { email, userid } = jwt.verify(token, SECRET);
-    req.user = { email, _id: userid }
-    next();
+
+    try {
+        const { email, userId } = jwt.verify(token, SECRET);
+        req.user = { email, _id: userId };
+        next();
+    } catch (err) {
+        return res.status(401).json({ success: false, message: "Invalid token" });
+    }
 }
 
-// 🟢 Profile
+// 🟢 Profile Route
 app.get('/profile', isLoggedIn, async (req, res) => {
-    const user = await userModel.findById(req.user._id);
-    if (!user) return res.status(404).json({ success: false, message: "User not found" });
-    res.json({ success: true, user });
+    try {
+        const user = await userModel.findById(req.user._id);
+        if (!user) return res.status(404).json({ success: false, message: "User not found" });
+        res.json({ success: true, user });
+    } catch (err) {
+        console.error(err);
+        res.status(500).json({ success: false, message: "Server error" });
+    }
 });
 
-// 🟢 Logout
+// 🟢 Logout Route
 app.get("/logout", (req, res) => {
-    res.cookie("token", "", { httpOnly: true, secure: true, sameSite: "none" });
+    res.cookie("token", "", {
+        httpOnly: true,
+        secure: isProduction,
+        sameSite: isProduction ? "none" : "lax",
+        maxAge: 0
+    });
     res.json({ success: true, message: "Logged out successfully" });
 });
 
-// 🟢 Update Profile
+// ------------------------------------------------------------------------------------
+
 app.put('/profile/update', isLoggedIn, upload.single('image'), async (req, res) => {
     const { username } = req.body;
     const imagefile = req.file ? req.file.path : null;
