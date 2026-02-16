@@ -135,18 +135,9 @@ const Home = () => {
 
                     <div className="flex space-x-2 items-center text-white">
                         {user?.image && (
-                            <img
-                                src={user.image}
-                                alt="User"
-                                className="w-12 h-12 border-2 border-slate-200 rounded-full"
-                            />
+                            <img src={user.image} alt="User" className="w-12 h-12 border-2 border-slate-200 rounded-full" />
                         )}
-                        <button
-                            onClick={() => navigate("/profile")}
-                            className="px-3 py-2 bg-gray-700 font-bold rounded-lg"
-                        >
-                            Profile
-                        </button>
+                        <button onClick={() => navigate("/profile")} className="px-3 py-2 bg-gray-700 font-bold rounded-lg">   Profile </button>
                     </div>
                 </div>
             </nav>
