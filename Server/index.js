@@ -7,17 +7,18 @@ const boardModel = require('./routes/boards');
 const upload = require('./routes/cloudinary');
 const bcrypt = require('bcrypt');
 const jwt = require('jsonwebtoken');
-const cors = require('cors');
 app.use(express.json());
 app.use(cookieParser());
 
+const cors = require("cors");
+
 app.use(cors({
-    origin: [
-        "https://test-pinterest-1.onrender.com",
-        "https://test-pinterest.onrender.com"
-    ],
-    credentials: true
+    origin: "https://test-pinterest-1.onrender.com",
+    credentials: true,
+    methods: ["GET", "POST", "PUT", "DELETE", "OPTIONS"],
 }));
+
+app.options("*", cors());
 
 
 const SECRET = "shhhh";
@@ -219,4 +220,6 @@ app.delete("/boards/:boardId/posts/:postId", isLoggedIn, async (req, res) => {
 });
 
 // ---------------- SERVER ----------------
-app.listen(3000, () => console.log("🚀 Server running on port 3000"));
+const PORT = process.env.PORT || 3000;
+
+app.listen(PORT, () => console.log(`🚀 Server running on port ${PORT}`));
