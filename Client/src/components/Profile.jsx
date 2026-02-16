@@ -14,14 +14,14 @@ const Profile = () => {
   const [formData, setFormData] = useState({ username: "", image: null });
 
   useEffect(() => {
-    axios.get('http://localhost:3000/profile', { withCredentials: true })
+    axios.get('https://test-pinterest.onrender.com/profile', { withCredentials: true })
       .then(res => {
         if (res.data.success) {
           setUser(res.data.user);
           setFormData({ username: res.data.user.username, image: res.data.user.image });
 
           // 🟢 Fetch boards only after user data is available
-          axios.get(`http://localhost:3000/boards/user/${res.data.user._id}`, { withCredentials: true })
+          axios.get(`https://test-pinterest.onrender.com/boards/user/${res.data.user._id}`, { withCredentials: true })
             .then(res => setBoards(res.data.boards))
             .catch(err => console.error("Error fetching boards:", err));
         } else {
@@ -32,7 +32,7 @@ const Profile = () => {
   }, []);
 
   const createBoard = () => {
-    axios.post("http://localhost:3000/boards", { name: newBoardName }, { withCredentials: true })
+    axios.post("https://test-pinterest.onrender.com/boards", { name: newBoardName }, { withCredentials: true })
       .then((res) => {
         const newBoard = res.data.board; // Naya board jo API se aaya
         setBoards(prevBoards => [newBoard, ...prevBoards]); // Naya board state me add karo
@@ -47,7 +47,7 @@ const Profile = () => {
     data.append("username", formData.username);
     if (formData.image) data.append("image", formData.image);
 
-    axios.put("http://localhost:3000/profile/update", data, { withCredentials: true })
+    axios.put("https://test-pinterest.onrender.com/profile/update", data, { withCredentials: true })
       .then((res) => {
         if (res.data.success) {
           setUser({
@@ -87,7 +87,7 @@ const Profile = () => {
           {/* Profile Image */}
           <div className="w-36 h-36 rounded-full border-4 border-gray-300 dark:border-gray-600 overflow-hidden shadow-md">
             {user && (
-              <img src={`http://localhost:3000/uploads/${user.image}`}
+              <img src={`https://test-pinterest.onrender.com/uploads/${user.image}`}
                 alt="User"
                 className="w-full h-full object-cover"
               />
@@ -121,7 +121,7 @@ const Profile = () => {
               </button>
 
               <button
-                onClick={() => axios.get("http://localhost:3000/logout", { withCredentials: true }).then(() => navigate("/login"))}
+                onClick={() => axios.get("https://test-pinterest.onrender.com/logout", { withCredentials: true }).then(() => navigate("/login"))}
                 className="px-5 py-2 bg-red-500 text-white font-bold text-lg rounded-lg shadow-md hover:bg-red-600 transition">
                 Logout
               </button>
@@ -176,7 +176,7 @@ const Profile = () => {
                   {board.posts.slice(0, 3).map((post, idx) => (
                     <img
                       key={idx}
-                      src={`http://localhost:3000/uploads/${post.image}`}
+                      src={`https://test-pinterest.onrender.com/uploads/${post.image}`}
                       alt={post.title}
                       className={`w-full object-cover rounded-md transition-all duration-300 ${idx === 1 ? 'row-span-2 h-48 border' : 'h-24 border-2'}`}
                     />

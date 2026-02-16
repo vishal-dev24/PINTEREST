@@ -10,7 +10,7 @@ const Dashboard = () => {
 
     useEffect(() => {
         axios
-            .get("http://localhost:3000/dashboard", { withCredentials: true })
+            .get("https://test-pinterest.onrender.com/dashboard", { withCredentials: true })
             .then((res) => {
                 console.log("Dashboard data:", res.data); // ✅ Check here
                 if (res.data.success) setData(res.data);
@@ -22,7 +22,7 @@ const Dashboard = () => {
     const deletePost = (postId) => {
         if (!window.confirm("Are you sure you want to delete this pin?")) return;
         axios
-            .delete(`http://localhost:3000/posts/${postId}`, { withCredentials: true })
+            .delete(`https://test-pinterest.onrender.com/posts/${postId}`, { withCredentials: true })
             .then(() => setData({ ...data, posts: data.posts.filter(p => p._id !== postId) }))
             .catch(err => console.error(err));
     };
@@ -31,7 +31,7 @@ const Dashboard = () => {
         if (!window.confirm("Remove this post from your board?")) return;
 
         try {
-            await axios.delete(`http://localhost:3000/boards/${boardId}/posts/${postId}`, { withCredentials: true });
+            await axios.delete(`https://test-pinterest.onrender.com/boards/${boardId}/posts/${postId}`, { withCredentials: true });
 
             // Update frontend state
             setData(prev => ({
@@ -52,7 +52,7 @@ const Dashboard = () => {
     const deleteBoard = (boardId) => {
         if (!window.confirm("Are you sure you want to delete this board?")) return;
         axios
-            .delete(`http://localhost:3000/boards/${boardId}`, { withCredentials: true })
+            .delete(`https://test-pinterest.onrender.com/boards/${boardId}`, { withCredentials: true })
             .then(() => setData({ ...data, boards: data.boards.filter(b => b._id !== boardId) }))
             .catch(err => console.error(err));
     };
@@ -76,7 +76,7 @@ const Dashboard = () => {
             {/* User Info */}
             <div className="flex items-center bg-white dark:bg-gray-800 p-6 rounded-xl shadow-lg mb-6 space-x-6">
                 <div className="w-32 h-32 rounded-full overflow-hidden border-4 border-gray-300 dark:border-gray-600">
-                    <img src={`http://localhost:3000/uploads/${data.user.image}`} alt="User" className="w-full h-full object-cover" />
+                    <img src={`https://test-pinterest.onrender.com/uploads/${data.user.image}`} alt="User" className="w-full h-full object-cover" />
                 </div>
                 <div>
                     <h2 className="text-3xl font-bold text-gray-900 dark:text-white">{data.user.username}</h2>
@@ -94,7 +94,7 @@ const Dashboard = () => {
                         {data.posts.map((post) => (
                             <div key={post._id} className="bg-white dark:bg-gray-800 rounded-xl shadow-md p-2 hover:shadow-xl transition-all">
                                 <a onClick={() => navigate(`/post/${post._id}`)}>
-                                    <img src={`http://localhost:3000/uploads/${post.image}`} alt={post.title} className="w-full h-48 object-cover rounded-lg mb-2" />
+                                    <img src={`https://test-pinterest.onrender.com/uploads/${post.image}`} alt={post.title} className="w-full h-48 object-cover rounded-lg mb-2" />
                                 </a>
                                 <h3 className="text-lg font-semibold text-gray-900 dark:text-white">{post.title}</h3>
                                 <p className="text-gray-600 dark:text-gray-400 text-sm">{post.description?.slice(0, 50)}...</p>
@@ -134,7 +134,7 @@ const Dashboard = () => {
                                     {board.posts.map((post) => (
                                         <div key={post._id} className="relative group">
                                             <img
-                                                src={`http://localhost:3000/uploads/${post.image}`}
+                                                src={`https://test-pinterest.onrender.com/uploads/${post.image}`}
                                                 alt={post.title}
                                                 className="w-full h-24 object-cover rounded-md"
                                             />
