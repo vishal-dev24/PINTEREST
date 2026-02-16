@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from "react";
+import React, { useRef, useState, useEffect } from "react";
 import { useParams, useNavigate } from "react-router-dom";
 import axios from "axios";
 import img from "../assets/pin.ico";
@@ -9,54 +9,66 @@ const SinglePin = () => {
     const [post, setPost] = useState(null);
     const [loading, setLoading] = useState(true);
     const navigate = useNavigate();
-
     const [boards, setBoards] = useState([]);
     const [selectedPost, setSelectedPost] = useState(null);
     const [showBoardModal, setShowBoardModal] = useState(false);
+    const [isZoomed, setIsZoomed] = useState(false);
+    const [showShare, setShowShare] = useState(false);
+    const shareRef = useRef(null);
+    const openZoom = () => setIsZoomed(true);
+    const closeZoom = () => setIsZoomed(false);
 
+    // Fetch single post
     useEffect(() => {
-        axios.get(`https://test-pinterest.onrender.com/posts/${postId}`, { withCredentials: true })
+        axios
+            .get(`http://localhost:3000/posts/${postId}`, { withCredentials: true })
             .then((res) => {
                 setPost(res.data.post);
-                setLoading(false); // ✅ Update loading state
+                setLoading(false);
             })
             .catch((err) => {
                 console.error("Error fetching post:", err);
-                setLoading(false); // ✅ Even on error, update loading state
+                setLoading(false);
             });
     }, [postId]);
 
-    if (loading) return <p className="text-center">Loading...</p>;
-    if (!post) return <p className="text-center text-red-500">Post not found</p>;
+    // Click outside Share Popup
+    useEffect(() => {
+        const handleClickOutside = (event) => {
+            if (shareRef.current && !shareRef.current.contains(event.target)) {
+                setShowShare(false);
+            }
+        };
+        document.addEventListener("mousedown", handleClickOutside);
+        return () => document.removeEventListener("mousedown", handleClickOutside);
+    }, []);
 
+    if (loading) return <p className="text-center text-lg mt-10">Loading...</p>;
+    if (!post) return <p className="text-center text-red-500 mt-10">Post not found</p>;
 
-    const handleDelete = () => {
-        const confirmDelete = window.confirm("Are you sure you want to delete this pin?");
-        if (!confirmDelete) return;
-
-        axios.delete(`https://test-pinterest.onrender.com/posts/${postId}`, { withCredentials: true })
-            .then(() => {
-                alert("Pin deleted successfully!");
-                navigate("/Pins"); // ✅ Redirect after deletion
-            })
-            .catch((err) => console.error("Error deleting post:", err));
-    };
-
+    // Open Board Modal
     const openBoardModal = (postId) => {
         setSelectedPost(postId);
         setShowBoardModal(true);
-        axios.get("https://test-pinterest.onrender.com/boards", { withCredentials: true })
-            .then((res) => { setBoards(res.data.boards) })
-            .catch(err => console.error(err));
+        axios
+            .get("http://localhost:3000/boards", { withCredentials: true })
+            .then((res) => setBoards(res.data.boards))
+            .catch((err) => console.error(err));
     };
 
+    // Save to Board
     const saveToBoard = (boardId) => {
-        axios.post(`https://test-pinterest.onrender.com/boards/${boardId}/save`, { postId: selectedPost }, { withCredentials: true })
+        axios
+            .post(
+                `http://localhost:3000/boards/${boardId}/save`,
+                { postId: selectedPost },
+                { withCredentials: true }
+            )
             .then(() => setShowBoardModal(false))
-            .catch(err => console.error(err));
+            .catch((err) => console.error(err));
     };
 
-    // dawnload
+    // Download Image
     const handleDownload = async (imageUrl, title) => {
         const response = await fetch(imageUrl);
         const blob = await response.blob();
@@ -68,52 +80,64 @@ const SinglePin = () => {
         document.body.removeChild(link);
     };
 
-
     return (
         <>
+            {/* Navbar */}
             <nav className="bg-white shadow-lg p-2 sticky top-0 z-50 w-full">
                 <div className="flex justify-between items-center px-1">
-                    <button onClick={() => navigate("/home")} className="text-3xl font-extrabold flex items-center space-x-1">
+                    <button
+                        onClick={() => navigate("/home")}
+                        className="text-3xl font-extrabold flex items-center space-x-1"
+                    >
                         <img src={img} alt="Pinterest Icon" className="w-12 h-12 rounded-full shadow-md" />
                         <span className="tracking-wide text-gray-800">Phinix</span>
                     </button>
                     <div className="flex space-x-2 items-center font-semibold">
-                        <button onClick={() => navigate("/CreatePost")} className="px-3 py-2 bg-gray-700 text-white rounded-lg">CreatePin</button>
-                        <button onClick={() => navigate("/Pins")} className="px-3 py-2 bg-gray-700 text-white rounded-lg">Pins</button>
+                        <button onClick={() => navigate("/CreatePost")} className="px-3 py-2 bg-gray-700 text-white rounded-lg">
+                            CreatePin
+                        </button>
+                        <button onClick={() => navigate("/Pins")} className="px-3 py-2 bg-gray-700 text-white rounded-lg">
+                            Pins
+                        </button>
                     </div>
                 </div>
             </nav>
 
+            {/* Main Content */}
             <div className="min-h-screen flex items-start justify-center bg-gray-500 p-8">
                 <div className="w-full max-w-5xl bg-white dark:bg-gray-800 shadow-xl rounded-2xl overflow-hidden flex flex-col md:flex-row transition-all">
-
                     {/* Left: Image Section */}
                     <div className="md:w-1/2 relative group border border-gray-300 dark:border-gray-700 bg-gray-100 dark:bg-gray-800 rounded-xl overflow-hidden">
                         <img
-                            src={post.image}
+                            src={`http://localhost:3000/uploads/${post.image}`}
                             alt={post.title}
                             className="object-cover w-full h-[380px] md:h-[480px] lg:h-[520px] transition-all rounded-xl"
                         />
-
-                        {/* Save Button */}
+                        {/* Zoom */}
                         <button
-                            className="absolute top-3 right-3 bg-gradient-to-r from-blue-500 to-indigo-600 text-white px-4 py-2 rounded-lg shadow-md opacity-0 group-hover:opacity-100 transform transition-all hover:scale-105"
+                            onClick={openZoom}
+                            className="absolute top-3 left-3 bg-white dark:bg-gray-900 text-gray-800 dark:text-white p-2 rounded-full shadow-md opacity-0 group-hover:opacity-100 hover:scale-110 transition-all"
+                            title="View Full Image"
+                        >
+                            🔍
+                        </button>
+                        {/* Save */}
+                        <button
                             onClick={() => openBoardModal(post._id)}
+                            className="absolute top-3 right-3 bg-gradient-to-r from-blue-500 to-indigo-600 text-white px-4 py-2 rounded-lg shadow-md opacity-0 group-hover:opacity-100 transform transition-all hover:scale-105"
                         >
                             Save
                         </button>
-
-                        {/* Download Button */}
+                        {/* Download */}
                         <img
                             src={lg}
-                            onClick={() => handleDownload(post.image, post.title)}
-                            className="absolute right-3 bottom-3 opacity-0 bg-blue-100 p-3 rounded-lg text-white shadow-md group-hover:opacity-100 transition-all hover:scale-105"
+                            onClick={() => handleDownload(`http://localhost:3000/uploads/${post.image}`, post.title)}
+                            className="absolute right-3 bottom-3 opacity-0 bg-blue-100 p-3 rounded-lg text-white shadow-md group-hover:opacity-100 transition-all hover:scale-105 cursor-pointer"
                         />
                     </div>
 
                     {/* Right: Details Section */}
                     <div className="md:w-1/2 py-6 px-8 flex flex-col justify-between space-y-4">
-
                         {/* Title & Description */}
                         <div className="mb-2">
                             <h2 className="text-2xl font-extrabold text-gray-900 dark:text-white capitalize">{post.title}</h2>
@@ -123,29 +147,101 @@ const SinglePin = () => {
                         {/* User Info & Likes */}
                         <div className="flex items-center gap-3">
                             {post.userId?.image && (
-                                <img src={post.userId.image} alt={post.userId.username} className="w-14 h-14 rounded-full object-cover border-2 border-gray-400 shadow-md" />
+                                <img
+                                    src={`http://localhost:3000/uploads/${post.userId.image}`}
+                                    alt={post.userId.username}
+                                    className="w-14 h-14 rounded-full object-cover border-2 border-gray-400 shadow-md"
+                                />
                             )}
-                            <p className="text-gray-600 dark:text-gray-400 text-lg font-semibold">{post.likes || 0} ❤️</p>
+                            <p className="text-gray-600 dark:text-gray-400 text-lg font-semibold">
+                                {post.likes?.length || 0} ❤️
+                            </p>
                         </div>
 
-                        {/* Buttons */}
-                        <div className="flex items-center justify-center gap-4 mt-5">
-                            <button
-                                onClick={() => navigate('/profile')}
-                                className="px-6 py-3 w-full bg-gray-900 text-white rounded-xl shadow-md hover:bg-gray-800 transition-all transform hover:scale-105"
-                            >
-                                Go Back
-                            </button>
-                            <button
-                                onClick={handleDelete}
-                                className="px-6 py-3 w-full bg-red-600 text-white rounded-xl shadow-md hover:bg-red-700 transition-all transform hover:scale-105"
-                            >
-                                Delete Pin
-                            </button>
+                        {/* Buttons + Share */}
+                        {/* Buttons + Share */}
+                        <div className="relative flex items-center justify-center gap-4 mt-5">
+                            <button onClick={() => navigate("/profile")} className="px-2 py-3 w-full bg-gray-900 text-white rounded-xl shadow-md hover:bg-gray-800 transition-all transform hover:scale-105">Back</button>
+                            <button onClick={() => setShowShare(!showShare)} className="px-2 py-3 w-full bg-blue-600 text-white rounded-xl shadow-md hover:bg-blue-500 transition-all transform hover:scale-105"> Share</button>
+
+                            {showShare && (
+                                <div
+                                    ref={shareRef}
+                                    className="absolute bottom-full mb-3 right-0 w-64 bg-slate-700 border shadow-xl rounded-xl p-4 flex flex-col gap-3 z-50 before:content-[''] before:absolute before:-bottom-2 before:right-5 before:w-3 before:h-3 before:bg-white dark:before:bg-gray-700 before:rotate-45"
+                                >
+                                    {/* Copy URL */}
+                                    <button
+                                        onClick={() => {
+                                            navigator.clipboard.writeText(window.location.href);
+                                            alert("URL copied!");
+                                        }}
+                                        className="flex items-center gap-2 px-3 py-2 bg-gray-100 dark:bg-gray-300 hover:bg-gray-200 dark:hover:bg-gray-600 rounded-full transition-all shadow-sm"
+                                    >
+                                        <svg
+                                            xmlns="http://www.w3.org/2000/svg"
+                                            className="h-5 w-5 text-gray-800 dark:text-black"
+                                            fill="none"
+                                            viewBox="0 0 24 24"
+                                            stroke="currentColor"
+                                        >
+                                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 16h8M8 12h8m-6 8h6m-6-4h6M8 8h8m-6-4h6" />
+                                        </svg>
+                                        Copy URL
+                                    </button>
+
+                                    {/* Facebook */}
+                                    <a
+                                        href={`https://www.facebook.com/sharer/sharer.php?u=${encodeURIComponent(window.location.href)}`}
+                                        target="_blank"
+                                        rel="noopener noreferrer"
+                                        className="flex items-center gap-2 px-3 py-2 bg-blue-600 hover:bg-blue-500 text-white rounded-full shadow-sm transition-all"
+                                    >
+                                        <img src="https://cdn.jsdelivr.net/gh/simple-icons/simple-icons/icons/facebook.svg" alt="FB" className="w-5 h-5" />
+                                        Facebook
+                                    </a>
+
+                                    {/* Twitter */}
+                                    <a
+                                        href={`https://twitter.com/intent/tweet?url=${encodeURIComponent(window.location.href)}&text=${encodeURIComponent(post.title)}`}
+                                        target="_blank"
+                                        rel="noopener noreferrer"
+                                        className="flex items-center gap-2 px-3 py-2 bg-blue-400 hover:bg-blue-300 text-white rounded-full shadow-sm transition-all"
+                                    >
+                                        <img src="https://cdn.jsdelivr.net/gh/simple-icons/simple-icons/icons/twitter.svg" alt="Twitter" className="w-5 h-5" />
+                                        Twitter
+                                    </a>
+
+                                    {/* WhatsApp */}
+                                    <a
+                                        href={`https://api.whatsapp.com/send?text=${encodeURIComponent(post.title + " " + window.location.href)}`}
+                                        target="_blank"
+                                        rel="noopener noreferrer"
+                                        className="flex items-center gap-2 px-3 py-2 bg-green-500 hover:bg-green-400 text-white rounded-full shadow-sm transition-all"
+                                    >
+                                        <img src="https://cdn.jsdelivr.net/gh/simple-icons/simple-icons/icons/whatsapp.svg" alt="WhatsApp" className="w-5 h-5" />
+                                        WhatsApp
+                                    </a>
+                                </div>
+                            )}
+
+
                         </div>
                     </div>
                 </div>
 
+                {/* Zoom Modal */}
+                {isZoomed && (
+                    <div
+                        onClick={closeZoom}
+                        className="fixed inset-0 p-12 bg-black bg-opacity-80 flex items-center justify-center z-50 cursor-zoom-out"
+                    >
+                        <img
+                            src={`http://localhost:3000/uploads/${post.image}`}
+                            alt={post.title}
+                            className="max-w-full max-h-full object-contain rounded-lg shadow-lg"
+                        />
+                    </div>
+                )}
 
                 {/* Save to Board Modal */}
                 {showBoardModal && (
@@ -159,9 +255,9 @@ const SinglePin = () => {
                                         className="text-gray-800 hover:text-white flex items-center w-full py-2 px-4 bg-gray-100 border-2 border-gray-300 rounded-lg mb-2 hover:bg-gray-800"
                                         onClick={() => saveToBoard(board._id)}
                                     >
-                                        {/* Board Image */}
                                         {board.posts.length > 0 ? (
-                                            <img src={board.posts[0].image}
+                                            <img
+                                                src={`http://localhost:3000/uploads/${board.posts[0].image}`}
                                                 alt={board.name}
                                                 className="w-14 h-14 rounded-lg border border-gray-400 mr-4 object-cover"
                                             />
@@ -185,8 +281,7 @@ const SinglePin = () => {
                         </div>
                     </div>
                 )}
-            </div>
-
+            </div >
         </>
     );
 };

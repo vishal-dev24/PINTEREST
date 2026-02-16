@@ -1,6 +1,6 @@
 import React, { useState } from 'react'
 import axios from 'axios'
-import { useNavigate } from 'react-router-dom';
+import { Link, useNavigate } from 'react-router-dom';
 import img from '../assets/pin.ico'
 
 const Register = () => {
@@ -15,56 +15,170 @@ const Register = () => {
   const handleSubmit = async (e) => {
     e.preventDefault();
     const data = new FormData();
-    Object.keys(formData).forEach(key => data.append(key, formData[key]));
-    await axios.post('https://test-pinterest.onrender.com/register', data, { withCredentials: true });
+    data.append('username', formData.username);
+    data.append('email', formData.email);
+    data.append('password', formData.password);
+    data.append('image', formData.image);
+    await axios.post('http://localhost:3000/register', data, { withCredentials: true });
     setFormData({ username: '', email: '', password: '', image: null });
     navigate('/login');
   }
 
   return (
-    <div className="min-h-screen w-full bg-gray-100">
-      <nav className="w-full bg-white p-2 shadow-md">
-        <div className="flex justify-between items-center px-5">
-          <button onClick={() => navigate("/home")} className="text-3xl font-extrabold flex items-center space-x-3">
-            <img src={img} alt="Pinterest Icon" className="w-12 h-12 rounded-full shadow-md" />
+    // <div className="min-h-screen w-full bg-gray-100">
+    //   <nav className="w-full bg-white p-2 shadow-md">
+    //     <div className="flex justify-between items-center px-5">
+    //       <button onClick={() => navigate("/home")} className="text-3xl font-extrabold flex items-center space-x-3">
+    //         <img src={img} alt="Pinterest Icon" className="w-12 h-12 rounded-full shadow-md" />
+    //         <span className="tracking-wide text-gray-800">Phinix</span>
+    //       </button>
+    //       <button type="submit" onClick={useNavigate('/login')}
+    //         className="bg-gray-800 hover:bg-gray-700 font-bold text-white px-3 py-2 rounded"><Link to="/login" >Login</Link></button>
+    //     </div>
+    //   </nav>
+
+    //   <div className="flex items-center justify-center flex-col p-7 mt-16">
+    //     <div className="bg-white p-6 rounded-xl shadow-xl w-full max-w-lg border-2 border-gray-600">
+    //       <h2 className="text-gray-900 text-3xl font-extrabold text-center mb-6">Join Phinix</h2>
+    //       <form onSubmit={handleSubmit} className="space-y-4">
+    //         <div>
+    //           <label className="block text-gray-700 font-semibold mb-3">Full Name</label>
+    //           <input type="text" name='username'
+    //             className="w-full p-3 rounded-lg border border-gray-600 focus:ring-2 focus:ring-gray-600 outline-none"
+    //             placeholder="Enter your name" onChange={handleChange} required value={formData.username} />
+    //         </div>
+    //         <div>
+    //           <label className="block text-gray-800 font-semibold mb-3">Email</label>
+    //           <input type="email" name='email'
+    //             className="w-full p-3 rounded-lg border border-gray-600 focus:ring-2 focus:ring-gray-600 outline-none"
+    //             placeholder="Enter your email" onChange={handleChange} required value={formData.email} />
+    //         </div>
+    //         <div>
+    //           <label className="block text-gray-800 font-semibold mb-3">Password</label>
+    //           <input type="password" name='password'
+    //             className="w-full p-3 rounded-lg border border-gray-600 focus:ring-2 focus:ring-gray-600 outline-none"
+    //             placeholder="Enter password" onChange={handleChange} required value={formData.password} />
+    //         </div>
+    //         <div>
+    //           <label className="block text-gray-800 font-semibold mb-3">Upload Image</label>
+    //           <input type="file" name='image'
+    //             className="w-full p-3 rounded-lg border border-gray-600 focus:ring-2 focus:ring-gray-600 outline-none"
+    //             placeholder="Enter password" onChange={handleChange} required />
+    //         </div>
+    //         <button type="submit"
+    //           className="w-full bg-gray-900 hover:bg-gray-700 text-white font-bold py-3 rounded-lg transition duration-300 shadow-md">
+    //           Register !
+    //         </button>
+    //       </form>
+    //     </div>
+    //   </div>
+    // </div>
+    <div className="min-h-screen w-full bg-gray-100 flex flex-col">
+
+      {/* Navbar */}
+      <nav className="w-full bg-white p-3 shadow-md">
+        <div className="flex justify-between items-center max-w-7xl mx-auto px-5">
+          <button
+            onClick={() => navigate("/home")}
+            className="text-2xl font-extrabold flex items-center space-x-3"
+          >
+            <img
+              src={img}
+              alt="Pinterest Icon"
+              className="w-10 h-10 rounded-full shadow-md"
+            />
             <span className="tracking-wide text-gray-800">Phinix</span>
           </button>
-          <button type="button" onClick={() => navigate('/login')} className="bg-gray-800 hover:bg-gray-700 font-bold text-white px-3 py-2 rounded"> Login</button>
+
+          <button
+            onClick={() => navigate("/login")}
+            className="bg-gray-900 hover:bg-gray-700 font-bold text-white px-4 py-2 rounded-lg transition"
+          >
+            Login
+          </button>
         </div>
       </nav>
 
-      <div className="flex items-start justify-center pt-16">
-        <div className="w-full max-w-xs bg-white border border-gray-500 rounded-lg shadow-lg p-4">
-          <h2 className="text-2xl font-bold text-center text-gray-900 mb-3">Join Phinix</h2>
+      {/* Center Section */}
+      <div className="flex flex-1 items-center justify-center px-4">
+        <div className="bg-white p-8 rounded-2xl shadow-xl w-full max-w-md border border-gray-300">
 
-          <form onSubmit={handleSubmit} className="space-y-3">
+          <h2 className="text-gray-900 text-3xl font-extrabold text-center mb-6">
+            Join Phinix
+          </h2>
+
+          <form onSubmit={handleSubmit} className="space-y-4">
+
             <div>
-              <label className="block text-sm sm:text-sm font-semibold text-gray-800 mb-1">Full Name</label>
-              <input type="text" name="username" value={formData.username} onChange={handleChange} required placeholder="Enter your name" className="w-full p-2 sm:p-3 text-sm sm:text-base border border-gray-400 rounded-md sm:rounded-lg outline-none focus:ring-1 focus:ring-gray-600" />
+              <label className="block text-gray-700 font-semibold mb-2">
+                Full Name
+              </label>
+              <input
+                type="text"
+                name="username"
+                className="w-full p-3 rounded-lg border border-gray-400 focus:ring-2 focus:ring-gray-700 outline-none"
+                placeholder="Enter your name"
+                onChange={handleChange}
+                required
+                value={formData.username}
+              />
             </div>
 
             <div>
-              <label className="block text-sm sm:text-sm font-semibold text-gray-800 mb-1">Email</label>
-              <input type="email" name="email" value={formData.email} onChange={handleChange} required placeholder="Enter your email" className="w-full p-2 sm:p-3 text-sm sm:text-base border border-gray-400 rounded-md sm:rounded-lg outline-none focus:ring-1 focus:ring-gray-600" />
+              <label className="block text-gray-700 font-semibold mb-2">
+                Email
+              </label>
+              <input
+                type="email"
+                name="email"
+                className="w-full p-3 rounded-lg border border-gray-400 focus:ring-2 focus:ring-gray-700 outline-none"
+                placeholder="Enter your email"
+                onChange={handleChange}
+                required
+                value={formData.email}
+              />
             </div>
 
             <div>
-              <label className="block text-sm sm:text-sm font-semibold text-gray-800 mb-1">Password</label>
-              <input type="password" name="password" value={formData.password} onChange={handleChange} required placeholder="Enter password" className="w-full p-2 sm:p-3 text-sm sm:text-base border border-gray-400 rounded-md sm:rounded-lg outline-none focus:ring-1 focus:ring-gray-600" />
+              <label className="block text-gray-700 font-semibold mb-2">
+                Password
+              </label>
+              <input
+                type="password"
+                name="password"
+                className="w-full p-3 rounded-lg border border-gray-400 focus:ring-2 focus:ring-gray-700 outline-none"
+                placeholder="Enter password"
+                onChange={handleChange}
+                required
+                value={formData.password}
+              />
             </div>
 
             <div>
-              <label className="block text-sm sm:text-sm font-semibold text-gray-800 mb-1">Upload Image</label>
-              <input type="file" name="image" onChange={handleChange} required className="w-full text-xs sm:text-sm border border-gray-400 rounded-md sm:rounded-lg p-1.5 sm:p-2.5" />
+              <label className="block text-gray-700 font-semibold mb-2">
+                Upload Image
+              </label>
+              <input
+                type="file"
+                name="image"
+                className="w-full p-3 rounded-lg border border-gray-400 focus:ring-2 focus:ring-gray-700 outline-none"
+                onChange={handleChange}
+                required
+              />
             </div>
 
-            <button type="submit" className="w-full bg-gray-900 text-white text-sm sm:text-base font-semibold py-2 sm:py-3 rounded-md sm:rounded-lg hover:bg-gray-700">Register</button>
+            <button
+              type="submit"
+              className="w-full bg-gray-900 hover:bg-gray-700 text-white font-bold py-3 rounded-lg transition duration-300 shadow-md"
+            >
+              Register
+            </button>
+
           </form>
         </div>
       </div>
+    </div>
 
-
-    </div >
   )
 }
 

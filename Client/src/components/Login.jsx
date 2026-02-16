@@ -14,45 +14,88 @@ const Login = () => {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-    await axios.post('https://test-pinterest.onrender.com/login', formData, { withCredentials: true });
-    setFormData({ email: '', password: '' });
+    await axios.post('http://localhost:3000/login', formData, { withCredentials: true });
+    setFormData({ username: '', email: '' });
     navigate('/home');
   }
+
+
   return (
-    <div className="min-h-screen w-full bg-gray-100">
-      <nav className="w-full bg-white p-2 shadow-md">
-        <div className="flex justify-between items-center px-5">
-          <a href="#" className="text-3xl font-extrabold flex items-center space-x-3">
-            <img src={img} alt="Pinterest Icon" className="w-12 h-12 rounded-full shadow-md" />
+    <div className="min-h-screen w-full bg-gray-100 flex flex-col">
+
+      {/* Navbar */}
+      <nav className="w-full bg-white p-3 shadow-md">
+        <div className="flex justify-between items-center max-w-7xl mx-auto px-5">
+          <a href="#" className="text-2xl font-extrabold flex items-center space-x-3">
+            <img
+              src={img}
+              alt="Pinterest Icon"
+              className="w-10 h-10 rounded-full shadow-md"
+            />
             <span className="tracking-wide text-gray-800">Phinix</span>
           </a>
-          <button type="button" onClick={() => navigate('/')} className="bg-gray-800 hover:bg-gray-700 font-bold text-white px-3 py-2 rounded"> Register</button>
+
+          <Link
+            to="/"
+            className="bg-gray-900 hover:bg-gray-700 font-bold text-white px-4 py-2 rounded-lg transition"
+          >
+            Register
+          </Link>
         </div>
       </nav>
 
-      <div className="flex items-start justify-center pt-20">
-        <div className="w-full max-w-xs bg-white border border-gray-500 rounded-lg shadow-lg p-4">
-          <h2 className="text-2xl font-bold text-center text-gray-900 mb-3">Join Phinix</h2>
+      {/* Center Section */}
+      <div className="flex flex-1 items-center justify-center px-4">
+        <div className="bg-white p-8 rounded-2xl shadow-xl w-full max-w-md border border-gray-300">
 
-          <form onSubmit={handleSubmit} className="space-y-3">
+          <h2 className="text-gray-900 text-3xl font-extrabold text-center mb-6">
+            Welcome Back
+          </h2>
+
+          <form onSubmit={handleSubmit} className="space-y-4">
+
             <div>
-              <label className="block text-sm sm:text-sm font-semibold text-gray-800 mb-1">Email</label>
-              <input type="email" name="email" value={formData.email} onChange={handleChange} required placeholder="Enter your email" className="w-full p-2 sm:p-3 text-sm sm:text-base border border-gray-500 rounded-md sm:rounded-lg outline-none focus:ring-1 focus:ring-gray-600" />
+              <label className="block text-gray-800 font-semibold mb-2">
+                Email
+              </label>
+              <input
+                type="email"
+                name="email"
+                className="w-full p-3 rounded-lg border border-gray-400 focus:ring-2 focus:ring-gray-700 outline-none"
+                placeholder="Enter your email"
+                onChange={handleChange}
+                required
+                value={formData.email}
+              />
             </div>
 
             <div>
-              <label className="block text-sm sm:text-sm font-semibold text-gray-800 mb-1">Password</label>
-              <input type="password" name="password" value={formData.password} onChange={handleChange} required placeholder="Enter password" className="w-full p-2 sm:p-3 text-sm sm:text-base border border-gray-500 rounded-md sm:rounded-lg outline-none focus:ring-1 focus:ring-gray-600" />
+              <label className="block text-gray-800 font-semibold mb-2">
+                Password
+              </label>
+              <input
+                type="password"
+                name="password"
+                className="w-full p-3 rounded-lg border border-gray-400 focus:ring-2 focus:ring-gray-700 outline-none"
+                placeholder="Enter password"
+                onChange={handleChange}
+                required
+                value={formData.password}
+              />
             </div>
 
-            <button type="submit"
-              className="w-full bg-gray-900 hover:bg-gray-700 text-white font-bold py-3 rounded-lg transition duration-300 shadow-md">
+            <button
+              type="submit"
+              className="w-full bg-gray-900 hover:bg-gray-700 text-white font-bold py-3 rounded-lg transition duration-300 shadow-md"
+            >
               Login
             </button>
+
           </form>
         </div>
       </div>
     </div>
+
   )
 }
 
