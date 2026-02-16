@@ -1,7 +1,7 @@
 const mongoose = require('mongoose')
 
-// mongoose.connect("mongodb://localhost:27017/PHINIX-1")
-mongoose.connect('mongodb+srv://spancovishal:HzLLrkUjyhrqFz3X@cluster0.bre00kg.mongodb.net/test-pinterest')
+mongoose.connect("mongodb://localhost:27017/PHINIX-1")
+    // mongoose.connect('mongodb+srv://spancovishal:HzLLrkUjyhrqFz3X@cluster0.bre00kg.mongodb.net/test-pinterest')
     .then(() => {
         console.log("MongoDB Connected");
     })
@@ -10,12 +10,16 @@ mongoose.connect('mongodb+srv://spancovishal:HzLLrkUjyhrqFz3X@cluster0.bre00kg.m
     });
 
 const userSchema = mongoose.Schema({
-    username: String,
-    password: String,
-    email: String,
+    username: { type: String, required: true },
+    password: { type: String, required: true },
+    email: { type: String, unique: true, required: true },
     image: String,
     posts: [{ type: mongoose.Schema.Types.ObjectId, ref: "Post" }],
     boards: [{ type: mongoose.Schema.Types.ObjectId, ref: "Board" }]
-})
+}, { timestamps: true });
 
-module.exports = mongoose.model('User', userSchema)
+/* INDEXES */
+userSchema.index({ email: 1 });        // Fast login lookup
+userSchema.index({ createdAt: -1 });   // If sorting users by newest
+
+module.exports = mongoose.model("User", userSchema);
