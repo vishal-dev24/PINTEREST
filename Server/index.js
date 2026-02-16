@@ -53,13 +53,9 @@ app.post('/login', async (req, res) => {
 function isLoggedIn(req, res, next) {
     const token = req.cookies.token;
     if (!token) return res.status(401).json({ success: false, message: "Unauthorized" });
-    try {
-        const { email, userId } = jwt.verify(token, SECRET);
-        req.user = { email, _id: userId }
-        next();
-    } catch (err) {
-        return res.status(401).json({ success: false, message: "Invalid token" });
-    }
+    const { email, userid } = jwt.verify(token, SECRET);
+    req.user = { email, _id: userid }
+    next();
 }
 
 // 🟢 Profile
