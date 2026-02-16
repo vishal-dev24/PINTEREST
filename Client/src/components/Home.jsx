@@ -135,7 +135,7 @@ const Home = () => {
                     <div className="flex space-x-2 items-center text-white">
                         {user && (
                             <img
-                                src={`https://test-pinterest.onrender.com/uploads/${user.image}`}
+                                src={`https://test-pinterest.onrender.com/${user.image}`}
                                 alt="User"
                                 className="w-12 h-12 border-2 border-slate-200 rounded-full"
                             />
@@ -155,12 +155,12 @@ const Home = () => {
                 {posts.map((post) => (
                     <div key={post._id} className="relative group break-inside-avoid bg-white shadow-lg rounded-lg overflow-hidden">
                         <a onClick={() => navigate(`/post/${post._id}`)}>
-                            <img src={`https://test-pinterest.onrender.com/uploads/${post.image}`} alt={post.title} className="w-full object-cover rounded-t-lg" />
+                            <img src={`https://test-pinterest.onrender.com/${post.image}`} alt={post.title} className="w-full object-cover rounded-t-lg" />
                         </a>
 
                         <button onClick={() => openBoardModal(post._id)} className="absolute top-2 right-2 bg-slate-900 text-white px-3 py-1 rounded-lg opacity-0 group-hover:opacity-100 transition"> Save </button>
 
-                        <img src={lg} onClick={() => handleDownload(`https://test-pinterest.onrender.com/uploads/${post.image}`, post.title)} className="absolute right-2 bottom-2 opacity-0 bg-white p-1 rounded-full shadow-lg group-hover:opacity-100 transition duration-300 hover:scale-110 hover:bg-gray-200 cursor-pointer" />
+                        <img src={lg} onClick={() => handleDownload(`https://test-pinterest.onrender.com/${post.image}`, post.title)} className="absolute right-2 bottom-2 opacity-0 bg-white p-1 rounded-full shadow-lg group-hover:opacity-100 transition duration-300 hover:scale-110 hover:bg-gray-200 cursor-pointer" />
                     </div>
                 ))}
             </div>
@@ -179,7 +179,7 @@ const Home = () => {
                                 <button key={board._id} className="text-gray-800 hover:text-white flex items-center w-full py-1 px-4 bg-gray-100 border-2 border-zinc-400 rounded-lg mb-2 hover:bg-gray-800" onClick={() => saveToBoard(board._id)}>
                                     {/* Board Image */}
                                     {board.posts.length > 0 ? (
-                                        <img src={`https://test-pinterest.onrender.com/uploads/${board.posts[0].image}`}
+                                        <img src={`https://test-pinterest.onrender.com/${board.posts[0].image}`}
                                             alt={board.name}
                                             className="w-12 h-12 rounded-lg border-slate-600 border mr-5" />
                                     ) : (

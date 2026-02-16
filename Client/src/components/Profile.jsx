@@ -87,7 +87,7 @@ const Profile = () => {
           {/* Profile Image */}
           <div className="w-36 h-36 rounded-full border-4 border-gray-300 dark:border-gray-600 overflow-hidden shadow-md">
             {user && (
-              <img src={`https://test-pinterest.onrender.com/uploads/${user.image}`}
+              <img src={`https://test-pinterest.onrender.com/${user.image}`}
                 alt="User"
                 className="w-full h-full object-cover"
               />
@@ -176,7 +176,7 @@ const Profile = () => {
                   {board.posts.slice(0, 3).map((post, idx) => (
                     <img
                       key={idx}
-                      src={`https://test-pinterest.onrender.com/uploads/${post.image}`}
+                      src={`https://test-pinterest.onrender.com/${post.image}`}
                       alt={post.title}
                       className={`w-full object-cover rounded-md transition-all duration-300 ${idx === 1 ? 'row-span-2 h-48 border' : 'h-24 border-2'}`}
                     />
