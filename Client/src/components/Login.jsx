@@ -5,20 +5,33 @@ import img from '../assets/pin.ico'
 
 const Login = () => {
   const navigate = useNavigate();
-  const [formData, setFormData] = useState({ email: '', password: '', });
+  const [formData, setFormData] = useState({ email: '', password: '' });
+  const [error, setError] = useState('');
+
+  const BASE_URL = "https://test-pinterest.onrender.com"; // local testing ke liye comment/uncomment karo
 
   const handleChange = (e) => {
     const { name, value } = e.target;
     setFormData({ ...formData, [name]: value });
+    setError(''); // reset error on input change
   };
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-    await axios.post('https://test-pinterest.onrender.com/login', formData, { withCredentials: true });
-    setFormData({ username: '', email: '' });
-    navigate('/home');
+    try {
+      const res = await axios.post(`${BASE_URL}/login`, formData, { withCredentials: true })
+      if (res.data.success) {
+        navigate('/home');
+      }
+    } catch (err) {
+      if (err.response && err.response.data && err.response.data.message) {
+        // show backend message
+        setError(err.response.data.message);
+      } else {
+        setError("Network or server error. Try again.");
+      }
+    }
   }
-
 
   return (
     <div className="min-h-screen w-full bg-gray-100 flex flex-col">
@@ -51,6 +64,11 @@ const Login = () => {
           <h2 className="text-gray-900 text-3xl font-extrabold text-center mb-6">
             Welcome Back
           </h2>
+
+          {/* Show error message */}
+          {error && (
+            <p className="text-red-500 text-center mb-4 font-semibold">{error}</p>
+          )}
 
           <form onSubmit={handleSubmit} className="space-y-4">
 
@@ -95,8 +113,7 @@ const Login = () => {
         </div>
       </div>
     </div>
-
   )
 }
 
-export default Login
+export default Login;

@@ -12,10 +12,12 @@ const Pins = () => {
   const [selectedPost, setSelectedPost] = useState(null);
   const [showBoardModal, setShowBoardModal] = useState(false);
 
+  const BASE_URL = "https://test-pinterest.onrender.com"; // local testing ke liye comment/uncomment karo
+
   // Fetch user info first
   useEffect(() => {
     axios
-      .get("https://test-pinterest.onrender.com/profile", { withCredentials: true })
+      .get(`${BASE_URL}/profile`, { withCredentials: true })
       .then((res) => {
         if (res.data.success) {
           setUser(res.data.user);
@@ -29,10 +31,9 @@ const Pins = () => {
   // Fetch user's pins once user data is available
   useEffect(() => {
     if (user) {
-      axios.get(`https://test-pinterest.onrender.com/posts/user/${user._id}`, { withCredentials: true })
-        .then((res) => {
-          setPosts(res.data.posts);
-        })
+      axios
+        .get(`${BASE_URL}/posts/user/${user._id}`, { withCredentials: true })
+        .then((res) => setPosts(res.data.posts))
         .catch((err) => console.error("Error fetching pins:", err));
     }
   }, [user]);
@@ -40,15 +41,17 @@ const Pins = () => {
   const openBoardModal = (postId) => {
     setSelectedPost(postId);
     setShowBoardModal(true);
-    axios.get("https://test-pinterest.onrender.com/boards", { withCredentials: true })
-      .then((res) => { setBoards(res.data.boards) })
-      .catch(err => console.error(err));
+    axios
+      .get(`${BASE_URL}/boards`, { withCredentials: true })
+      .then((res) => setBoards(res.data.boards))
+      .catch((err) => console.error(err));
   };
 
   const saveToBoard = (boardId) => {
-    axios.post(`https://test-pinterest.onrender.com/boards/${boardId}/save`, { postId: selectedPost }, { withCredentials: true })
+    axios
+      .post(`${BASE_URL}/boards/${boardId}/save`, { postId: selectedPost }, { withCredentials: true })
       .then(() => setShowBoardModal(false))
-      .catch(err => console.error(err));
+      .catch((err) => console.error(err));
   };
 
   //  download

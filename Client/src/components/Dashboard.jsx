@@ -8,9 +8,11 @@ const Dashboard = () => {
     const [loading, setLoading] = useState(true);
     const [data, setData] = useState({ user: null, posts: [], boards: [] });
 
+    const BASE_URL = "https://test-pinterest.onrender.com"; // local testing ke liye comment/uncomment karo
+
     useEffect(() => {
         axios
-            .get("https://test-pinterest.onrender.com/dashboard", { withCredentials: true })
+        axios.get(`${BASE_URL}/dashboard`, { withCredentials: true })
             .then((res) => {
                 console.log("Dashboard data:", res.data); // ✅ Check here
                 if (res.data.success) setData(res.data);
@@ -22,7 +24,7 @@ const Dashboard = () => {
     const deletePost = (postId) => {
         if (!window.confirm("Are you sure you want to delete this pin?")) return;
         axios
-            .delete(`https://test-pinterest.onrender.com/posts/${postId}`, { withCredentials: true })
+            .delete(`${BASE_URL}/posts/${postId}`, { withCredentials: true })
             .then(() => setData({ ...data, posts: data.posts.filter(p => p._id !== postId) }))
             .catch(err => console.error(err));
     };
@@ -31,7 +33,7 @@ const Dashboard = () => {
         if (!window.confirm("Remove this post from your board?")) return;
 
         try {
-            await axios.delete(`https://test-pinterest.onrender.com/boards/${boardId}/posts/${postId}`, { withCredentials: true });
+            axios.delete(`${BASE_URL}/boards/${boardId}/posts/${postId}`, { withCredentials: true })
 
             // Update frontend state
             setData(prev => ({
@@ -48,11 +50,10 @@ const Dashboard = () => {
         }
     };
 
-
     const deleteBoard = (boardId) => {
         if (!window.confirm("Are you sure you want to delete this board?")) return;
         axios
-            .delete(`https://test-pinterest.onrender.com/boards/${boardId}`, { withCredentials: true })
+            .delete(`${BASE_URL}/boards/${boardId}`, { withCredentials: true })
             .then(() => setData({ ...data, boards: data.boards.filter(b => b._id !== boardId) }))
             .catch(err => console.error(err));
     };

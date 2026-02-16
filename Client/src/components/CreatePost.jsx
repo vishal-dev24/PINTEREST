@@ -5,16 +5,13 @@ import img from "../assets/pin.ico";
 
 const CreatePost = () => {
   const navigate = useNavigate();
-  const [formData, setFormData] = useState({
-    title: "",
-    description: "",
-    image: null,
-    userId: "", // ✅ Add userId
-  });
+  const [formData, setFormData] = useState({ title: "", description: "", image: null, userId: "" })
+
+  const BASE_URL = "https://test-pinterest.onrender.com"; // local testing ke liye comment/uncomment karo
 
   // Fetch logged-in user details (including userId)
   useEffect(() => {
-    axios.get("https://test-pinterest.onrender.com/profile", { withCredentials: true })
+    axios.get(`${BASE_URL}/profile`, { withCredentials: true })
       .then(res => {
         if (res.data.success) {
           setFormData(prev => ({ ...prev, userId: res.data.user._id })); // ✅ Set userId
@@ -44,10 +41,7 @@ const CreatePost = () => {
     data.append("userId", formData.userId); // ✅ Send userId
 
     try {
-      await axios.post("https://test-pinterest.onrender.com/posts/create", data, {
-        withCredentials: true,
-        headers: { "Content-Type": "multipart/form-data" },
-      });
+      await axios.post(`${BASE_URL}/posts/create`, data, { withCredentials: true, headers: { "Content-Type": "multipart/form-data" } })
       setFormData({ title: "", description: "", image: null, userId: formData.userId });
       navigate("/pins");
     } catch (error) {

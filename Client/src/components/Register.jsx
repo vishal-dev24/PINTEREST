@@ -7,6 +7,9 @@ const Register = () => {
   const navigate = useNavigate();
   const [formData, setFormData] = useState({ username: '', email: '', password: '', image: null });
 
+  const BASE_URL = "https://test-pinterest.onrender.com"; // local testing ke liye comment/uncomment karo
+
+
   const handleChange = (e) => {
     const { name, value, files } = e.target;
     setFormData({ ...formData, [name]: files ? files[0] : value });
@@ -19,7 +22,7 @@ const Register = () => {
     data.append('email', formData.email);
     data.append('password', formData.password);
     data.append('image', formData.image);
-    await axios.post('https://test-pinterest.onrender.com/register',
+    await axios.post(`${BASE_URL}`,
       data, { withCredentials: true });
     setFormData({ username: '', email: '', password: '', image: null });
     navigate('/login');

@@ -18,10 +18,12 @@ const SinglePin = () => {
     const openZoom = () => setIsZoomed(true);
     const closeZoom = () => setIsZoomed(false);
 
+    const BASE_URL = "https://test-pinterest.onrender.com"; // local testing ke liye comment/uncomment karo
+
     // Fetch single post
     useEffect(() => {
         axios
-            .get(`https://test-pinterest.onrender.com/posts/${postId}`, { withCredentials: true })
+            .get(`${BASE_URL}/posts/${postId}`, { withCredentials: true })
             .then((res) => {
                 setPost(res.data.post);
                 setLoading(false);
@@ -51,7 +53,7 @@ const SinglePin = () => {
         setSelectedPost(postId);
         setShowBoardModal(true);
         axios
-            .get("https://test-pinterest.onrender.com/boards", { withCredentials: true })
+            .get(`${BASE_URL}/boards`, { withCredentials: true })
             .then((res) => setBoards(res.data.boards))
             .catch((err) => console.error(err));
     };
@@ -60,7 +62,7 @@ const SinglePin = () => {
     const saveToBoard = (boardId) => {
         axios
             .post(
-                `https://test-pinterest.onrender.com/boards/${boardId}/save`,
+                `${BASE_URL}/boards/${boardId}/save`,
                 { postId: selectedPost },
                 { withCredentials: true }
             )

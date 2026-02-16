@@ -13,15 +13,17 @@ const Profile = () => {
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [formData, setFormData] = useState({ username: "", image: null });
 
+  const BASE_URL = "https://test-pinterest.onrender.com"; // local testing ke liye comment/uncomment karo
+
   useEffect(() => {
-    axios.get('https://test-pinterest.onrender.com/profile', { withCredentials: true })
+    axios.get(`${BASE_URL}/profile`, { withCredentials: true })
       .then(res => {
         if (res.data.success) {
           setUser(res.data.user);
           setFormData({ username: res.data.user.username, image: res.data.user.image });
 
           // 🟢 Fetch boards only after user data is available
-          axios.get(`https://test-pinterest.onrender.com/boards/user/${res.data.user._id}`, { withCredentials: true })
+          axios.get(`${BASE_URL}/boards/user/${res.data.user._id}`, { withCredentials: true })
             .then(res => setBoards(res.data.boards))
             .catch(err => console.error("Error fetching boards:", err));
         } else {
@@ -32,7 +34,7 @@ const Profile = () => {
   }, []);
 
   const createBoard = () => {
-    axios.post("https://test-pinterest.onrender.com/boards", { name: newBoardName }, { withCredentials: true })
+    axios.post(`${BASE_URL}/boards`, { name: newBoardName }, { withCredentials: true })
       .then((res) => {
         const newBoard = res.data.board; // Naya board jo API se aaya
         setBoards(prevBoards => [newBoard, ...prevBoards]); // Naya board state me add karo
@@ -47,7 +49,7 @@ const Profile = () => {
     data.append("username", formData.username);
     if (formData.image) data.append("image", formData.image);
 
-    axios.put("https://test-pinterest.onrender.com/profile/update", data, { withCredentials: true })
+    axios.post(`${BASE_URL}/profile/update`, data, { withCredentials: true })
       .then((res) => {
         if (res.data.success) {
           setUser({
@@ -56,9 +58,12 @@ const Profile = () => {
             image: formData.image ? `${res.data.user.image}?t=${Date.now()}` : user.image
           });
           setIsModalOpen(false);
+          console.log("// Updated user:", JSON.stringify(res.data.user, null, 2));
         }
-      });
+      })
+      .catch(err => console.error("Error updating profile:", err));
   };
+
 
   return (
     <div className="dark:bg-gray-900  min-h-screen pb-10">
@@ -78,7 +83,6 @@ const Profile = () => {
           </div>
         </div>
       </nav>
-
 
       {/* Profile Section */}
       <div className="flex justify-center items-center min-h-[50vh] bg-gray-100 dark:bg-gray-900 px-4">
@@ -121,7 +125,7 @@ const Profile = () => {
               </button>
 
               <button
-                onClick={() => axios.get("https://test-pinterest.onrender.com/logout", { withCredentials: true }).then(() => navigate("/login"))}
+                onClick={() => axios.get(`${BASE_URL}/logout`, { withCredentials: true }).then(() => navigate("/login"))}
                 className="px-5 py-2 bg-red-500 text-white font-bold text-lg rounded-lg shadow-md hover:bg-red-600 transition">
                 Logout
               </button>

@@ -6,7 +6,6 @@ import lg from "../assets/lg.png";
 
 const Home = () => {
     const navigate = useNavigate();
-
     const [user, setUser] = useState(null);
     const [posts, setPosts] = useState([]);
     const [boards, setBoards] = useState([]);
@@ -20,35 +19,32 @@ const Home = () => {
     const [loading, setLoading] = useState(false);
     const [hasMore, setHasMore] = useState(true);
 
+    const BASE_URL = "https://test-pinterest.onrender.com"; // local testing ke liye comment/uncomment karo
+
     // 🔥 Fetch Posts Function
     const fetchPosts = async (pageNumber) => {
         if (loading || !hasMore) return;
-
         setLoading(true);
-
         try {
-            const res = await axios.get(`https://test-pinterest.onrender.com/posts?page=${pageNumber}`);
+            const res = await axios.get(`${BASE_URL}/posts?page=${pageNumber}`);
 
             if (res.data.posts.length === 0) {
                 setHasMore(false);
             } else {
                 setPosts(prev => {
-                    const newPosts = res.data.posts.filter(
-                        post => !prev.some(p => p._id === post._id)
-                    );
-                    return [...prev, ...newPosts];
+                    const newPosts = res.data.posts.filter(post => !prev.some(p => p._id === post._id)
+                    ); return [...prev, ...newPosts];
                 });
             }
         } catch (err) {
             console.error(err);
         }
-
         setLoading(false);
     };
 
     // 🔥 Initial Load
     useEffect(() => {
-        axios.get("https://test-pinterest.onrender.com/profile", { withCredentials: true })
+        axios.get(`${BASE_URL}/profile`, { withCredentials: true })
             .then((res) => {
                 if (res.data.success) setUser(res.data.user);
                 else navigate("/login");
@@ -62,7 +58,6 @@ const Home = () => {
     useEffect(() => {
         const handleScroll = () => {
             if (loading || !hasMore) return;
-
             if (
                 window.innerHeight + window.scrollY >=
                 document.documentElement.scrollHeight - 200
@@ -87,13 +82,12 @@ const Home = () => {
         setSelectedPost(postId);
         setShowBoardModal(true);
 
-        axios.get("https://test-pinterest.onrender.com/boards", { withCredentials: true })
+        axios.get(`${BASE_URL}/boards`, { withCredentials: true })
             .then((res) => setBoards(res.data.boards))
             .catch(err => console.error(err));
     };
-
     const createBoard = () => {
-        axios.post("https://test-pinterest.onrender.com/boards", { name: newBoardName }, { withCredentials: true })
+        axios.post(`${BASE_URL}/boards`, { name: newBoardName }, { withCredentials: true })
             .then(() => {
                 setShowCreateBoardModal(false);
                 setNewBoardName("");
@@ -101,15 +95,15 @@ const Home = () => {
             })
             .catch(err => console.error(err));
     };
-
     const saveToBoard = (boardId) => {
-        axios.post(`https://test-pinterest.onrender.com/boards/${boardId}/save`,
+        axios.post(`${BASE_URL}/boards/${boardId}/save`,
             { postId: selectedPost },
             { withCredentials: true }
         )
             .then(() => setShowBoardModal(false))
             .catch(err => console.error(err));
     };
+
 
     const handleDownload = async (imageUrl, title) => {
         if (!imageUrl) return; // 🔹 Check if image exists
@@ -122,7 +116,6 @@ const Home = () => {
         link.click();
         document.body.removeChild(link);
     };
-
     return (
         <div className="min-h-screen">
             {/* Navbar */}

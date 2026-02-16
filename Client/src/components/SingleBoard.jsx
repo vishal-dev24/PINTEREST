@@ -13,26 +13,25 @@ const SingleBoard = () => {
     const [selectedPost, setSelectedPost] = useState(null);
     const [showBoardModal, setShowBoardModal] = useState(false);
 
+    const BASE_URL = "https://test-pinterest.onrender.com"; // local testing ke liye comment/uncomment karo
 
     useEffect(() => {
-        axios.get(`https://test-pinterest.onrender.com/boards/${boardId}`)
+        axios.get(`${BASE_URL}/boards/${boardId}`)
             .then((res) => setBoard(res.data.board))
             .catch((err) => console.error("Error fetching board:", err));
     }, [boardId]);
-
     if (!board) return <p className="text-center text-lg mt-10">Loading...</p>;
-
 
     const openBoardModal = (postId) => {
         setSelectedPost(postId);
         setShowBoardModal(true);
-        axios.get("https://test-pinterest.onrender.com/boards", { withCredentials: true })
+        axios.get(`${BASE_URL}/boards`, { withCredentials: true })
             .then((res) => { setBoards(res.data.boards) })
             .catch(err => console.error(err));
     };
 
     const saveToBoard = (boardId) => {
-        axios.post(`https://test-pinterest.onrender.com/boards/${boardId}/save`, { postId: selectedPost }, { withCredentials: true })
+        axios.post(`${BASE_URL}/boards/${boardId}/save`, { postId: selectedPost }, { withCredentials: true })
             .then(() => setShowBoardModal(false))
             .catch(err => console.error(err));
     };
