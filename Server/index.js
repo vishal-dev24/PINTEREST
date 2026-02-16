@@ -23,20 +23,14 @@ app.use((req, res, next) => {
 
 // 🟢 Register Route
 app.post('/register', upload.single('image'), async (req, res) => {
-    try {
-        const { username, email, password } = req.body;
-        const imagefile = req.file ? req.file.filename : null;
-        const existingUser = await userModel.findOne({ email });
-        if (existingUser) return res.json({ success: false, message: "User already exists" });
-        const hash = await bcrypt.hash(password, 10);
-        const user = await userModel.create({ username, email, password: hash, image: imagefile });
-        const token = jwt.sign({ email, userId: user._id }, SECRET);
-        res.cookie("token", token, { httpOnly: true, secure: true, sameSite: "none" });
-        res.json({ success: true, message: "User registered successfully", user });
-    } catch (err) {
-        console.error(err);
-        res.status(500).json({ success: false, message: "Server error" });
-    }
+    const { username, email, password } = req.body;
+    const imagefile = req.file ? req.file.secure_url : null;
+    const hash = await bcrypt.hash(password, 10);
+    const user = await userModel.create({ username, email, password: hash, image: imagefile });
+    const token = jwt.sign({ email, userId: user._id }, SECRET);
+    res.cookie("token", token, { httpOnly: true, secure: true, sameSite: "none" });
+    res.json({ success: true, message: "User registered successfully", user });
+
 });
 
 // 🟢 Login Route
@@ -85,7 +79,7 @@ app.get("/logout", (req, res) => {
 // 🟢 Update Profile
 app.put('/profile/update', isLoggedIn, upload.single('image'), async (req, res) => {
     const { username } = req.body;
-    const imagefile = req.file ? req.file.filename : null;
+    const imagefile = req.file ? req.file.secure_url : null;
     const updatedUser = await userModel.findByIdAndUpdate(req.user._id, { username, image: imagefile }, { new: true });
     res.json({ success: true, user: updatedUser });
 })
@@ -94,7 +88,7 @@ app.put('/profile/update', isLoggedIn, upload.single('image'), async (req, res) 
 app.post("/posts/create", isLoggedIn, upload.single("image"), async (req, res) => {
     try {
         const { title, description } = req.body;
-        const imagefile = req.file ? req.file.filename : null;
+        const imagefile = req.file ? req.file.secure_url : null;
         const post = await postModel.create({ user: req.user._id, title, description, image: imagefile, likes: [req.user._id] })
         await userModel.findByIdAndUpdate(req.user._id, { $push: { posts: post._id } })
         res.json({ success: true, post });
