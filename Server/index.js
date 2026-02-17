@@ -19,7 +19,9 @@ process.on('unhandledRejection', (err) => {
 
 app.use(express.json());
 app.use(cookieParser());
+
 app.use(cors({ origin: ['https://test-pinterest.onrender.com', 'https://test-pinterest-1.onrender.com'], credentials: true }));
+// app.use(cors({ origin: "http://localhost:5173", credentials: true }));
 
 const SECRET = "shhhh"; // Secret key for JWT
 
@@ -96,7 +98,7 @@ app.post('/profile/update', isLoggedIn, upload.single('image'), async (req, res)
         );
 
         res.json({ success: true, user: updatedUser });
-        console.log("// User updated:", JSON.stringify(updatedUser, null, 2));
+        console.log("// User updated:", (updatedUser));
     } catch (err) {
         console.error("// Error updating user:", err);
         res.status(500).json({ success: false, message: "Update failed", error: err.message });
@@ -148,7 +150,7 @@ app.get("/posts/user/:userId", isLoggedIn, async (req, res) => {
 app.get("/posts/:id", isLoggedIn, async (req, res) => {
     const post = await postModel.findById(req.params.id).populate("user", "username image");
     res.json({ success: true, post });
-    console.log("// see the post", { post })
+    // console.log("// see the post", { post })
 });
 // 🟢 DELETE PIN
 app.delete("/posts/:postId", isLoggedIn, async (req, res) => {
@@ -312,4 +314,5 @@ app.delete("/boards/:boardId/posts/:postId", isLoggedIn, async (req, res) => {
     }
 });
 
-app.listen(3000, () => console.log(`🚀 Server running on port 3000`));
+const PORT = process.env.PORT || 3000;
+app.listen(PORT, () => console.log(`🚀 Server running on port ${PORT}`));
