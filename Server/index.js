@@ -10,79 +10,113 @@ const jwt = require('jsonwebtoken');
 const cors = require('cors');
 app.use(express.json());
 app.use(cookieParser());
-
-// --- GLOBAL ERROR HANDLERS ---
-process.on('uncaughtException', (err) => {
-    console.error('Uncaught Exception:', err);
-});
-process.on('unhandledRejection', (err) => {
-    console.error('Unhandled Rejection:', err);
-});
-
 app.use(cors({ origin: 'https://test-pinterest-1.onrender.com', credentials: true }));
 
 const SECRET = "shhhh"; // Secret key for JWT
 
-// 🟢 Register Route
+
 app.post('/register', upload.single('image'), async (req, res) => {
-    const { username, email, password } = req.body;
-    const imageUrl = req.file ? req.file.path : null; // <-- use path, not filename
-    bcrypt.hash(password, 10, async (err, hash) => {
-        const user = await userModel.create({ username, email, password: hash, image: imageUrl });
-        const token = jwt.sign({ email, userId: user._id }, SECRET);
-        res.cookie("token", token, { httpOnly: true, sameSite: "none", secure: true });
-        res.json({ success: true, message: "User registered successfully", user });
-        console.log("// user created ", { user })
-    });
-});
-// 🟢 Login Route
-app.post('/login', async (req, res) => {
-    const { email, password } = req.body;
     try {
-        const user = await userModel.findOne({ email });
-        if (!user) { return res.status(404).json({ success: false, message: "This user is not in your database" }); }
-        const match = await bcrypt.compare(password, user.password);
-        if (!match) {
-            return res.status(400).json({ success: false, message: "Invalid email or password" });
+        const { username, email, password } = req.body;
+        // Duplicate email check
+        const existingUser = await userModel.findOne({ email });
+        if (existingUser) {
+            return res.status(400).json({ success: false, message: "Email already registered" });
         }
-        const token = jwt.sign({ email, userId: user._id }, SECRET);
-        res.cookie("token", token, { httpOnly: true, secure: true, sameSite: "None" });
-        res.json({ success: true, message: "Login successful", user });
-        console.log('Login successful:', user);
+
+        const hash = await bcrypt.hash(password, 10);
+        const imageUrl = req.file ? req.file.path : null;
+        const user = await userModel.create({ username, email, password: hash, image: imageUrl });
+        const token = jwt.sign({ email, userId: user._id }, SECRET, { expiresIn: '1h' });
+
+        // Set cookie for deploy
+        res.cookie("token", token, {
+            httpOnly: true,
+            secure: true,
+            sameSite: "None",
+            maxAge: 1000 * 60 * 60, // 1 hour
+        });
+
+        res.json({ success: true, message: "User registered successfully", user });
     } catch (err) {
-        console.error("// Login error:", err);
+        console.error("Register error:", err);
+        res.status(500).json({ success: false, message: "Registration failed", error: err.message });
+    }
+});
+
+// ================= LOGIN ROUTE =================
+app.post('/login', async (req, res) => {
+    try {
+        const { email, password } = req.body;
+
+        const user = await userModel.findOne({ email });
+        if (!user) return res.status(404).json({ success: false, message: "User not found" });
+
+        const match = await bcrypt.compare(password, user.password);
+        if (!match) return res.status(400).json({ success: false, message: "Invalid email or password" });
+
+        const token = jwt.sign({ email, userId: user._id }, SECRET, { expiresIn: '1h' });
+
+        // Set cookie for deploy
+        res.cookie("token", token, {
+            httpOnly: true,
+            secure: true,
+            sameSite: "None",
+            maxAge: 1000 * 60 * 60,
+        });
+
+        res.json({ success: true, message: "Login successful", user });
+    } catch (err) {
+        console.error("Login error:", err);
         res.status(500).json({ success: false, message: "Server error", error: err.message });
     }
 });
 
-// 🟢 Middleware to Check Login
+// ================= AUTH MIDDLEWARE =================
 function isLoggedIn(req, res, next) {
     const token = req.cookies.token;
     if (!token) return res.status(401).json({ success: false, message: "Unauthorized" });
     try {
         const { email, userId } = jwt.verify(token, SECRET);
-        req.user = { email, _id: userId }
+        req.user = { email, _id: userId };
         next();
     } catch (err) {
         return res.status(401).json({ success: false, message: "Invalid token" });
     }
 }
 
-// 🟢 Profile Route
+// ================= PROFILE ROUTE =================
 app.get('/profile', isLoggedIn, async (req, res) => {
-    const user = await userModel.findById(req.user._id);
-    if (!user) return res.status(404).json({ success: false, message: "User not found" });
-    res.json({ success: true, user });
-    // console.log("// user is here", { user: user._id })
+    try {
+        const user = await userModel.findById(req.user._id);
+        if (!user) return res.status(404).json({ success: false, message: "User not found" });
+        res.json({ success: true, user });
+    } catch (err) {
+        console.error("Profile error:", err);
+        res.status(500).json({ success: false, message: "Server error", error: err.message });
+    }
 });
 
-// 🟢 Logout Route
+// ================= LOGOUT ROUTE =================
 app.get("/logout", (req, res) => {
-    res.cookie("token", "", { httpOnly: true, secure: true, sameSite: "None" });
+    res.cookie("token", "", {
+        httpOnly: true,
+        secure: true,
+        sameSite: "None",
+        maxAge: 0,
+    });
     res.json({ success: true, message: "Logged out successfully" });
-    console.log('Logged out successfully ')
-
 });
+
+
+
+
+
+
+
+
+
+
 
 // 🟢 Profile Update Route (POST + Cloudinary)
 app.post('/profile/update', isLoggedIn, upload.single('image'), async (req, res) => {
