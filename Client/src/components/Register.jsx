@@ -26,11 +26,45 @@ const Register = () => {
     data.append('password', formData.password);
     data.append('image', formData.image);
 
-    await axios.post(`${BASE_URL}/register`, data, { withCredentials: true });
-
-    setLoading(false); // 👈 yaha
-    navigate('/login');
+    try {
+      const res = await axios.post(`${BASE_URL}/register`, data, { withCredentials: true });
+      console.log(res.data);
+      setFormData({ username: '', email: '', password: '', image: null });
+      navigate('/login');
+    } catch (err) {
+      console.error(err.response?.data || err);
+      alert(err.response?.data?.message || "Server Error");
+    }
   };
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 
   return (
