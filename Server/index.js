@@ -1,4 +1,5 @@
 const express = require('express');
+const app = express();
 const cookieParser = require('cookie-parser');
 const userModel = require('./routes/users');
 const postModel = require('./routes/posts');
@@ -7,7 +8,8 @@ const upload = require('./routes/cloudinary');
 const bcrypt = require('bcrypt');
 const jwt = require('jsonwebtoken');
 const cors = require('cors');
-const app = express();
+app.use(express.json());
+app.use(cookieParser());
 
 // --- GLOBAL ERROR HANDLERS ---
 process.on('uncaughtException', (err) => {
@@ -17,19 +19,9 @@ process.on('unhandledRejection', (err) => {
     console.error('Unhandled Rejection:', err);
 });
 
-app.use(express.json());
-app.use(cookieParser());
-
-app.use(cors({
-    origin: ['https://test-pinterest.onrender.com',
-        'https://test-pinterest-1.onrender.com'],
-    credentials: true
-}));
-
-// app.use(cors({ origin: "http://localhost:5173", credentials: true }));
+app.use(cors({ origin: 'https://test-pinterest-1.onrender.com', credentials: true }));
 
 const SECRET = "shhhh"; // Secret key for JWT
-
 
 // 🟢 Register Route
 app.post('/register', upload.single('image'), async (req, res) => {
